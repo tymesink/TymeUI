@@ -482,7 +482,8 @@
 			"ERR_GUILD_PLAYER_NOT_IN_GUILD",
 			"BATTLENET_UNAVAILABLE",
 			"FriendsFrameAddFriendButton",
-			"DropDownList1"
+			"DropDownList1",
+			"ToggleClickBindingFrame"
 		]
 	}
 }
