@@ -49,6 +49,13 @@ local slashcmds = function()
 		elseif IsAddOnLoaded("stAddonManager") then
 			local stAMFunc = SlashCmdList["STADDONMANAGER"];
 			stAMFunc();
+		elseif IsAddOnLoaded("SimpleAddonManager") then
+			local samFrame = _G["SimpleAddonManager"]
+			if samFrame then
+				samFrame:Show()
+			else
+				print("SimpleAddonManager frame not found.")
+			end
 		else
 			ns.toggleFrame("AddonList");
 		end		

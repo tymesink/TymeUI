@@ -237,6 +237,8 @@
         "TALENT_SPEC_SECONDARY",
         "HELPFRAME_CHARACTER_BULLET5",
         "TALENT_MICRO_BUTTON_NO_SPEC",
-        "RED_FONT_COLOR"
+        "RED_FONT_COLOR",
+        "ToggleTimeManager",
+        "ToggleClickBindingFrame"
     ]
 }
