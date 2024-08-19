@@ -92,7 +92,7 @@ function PF:BuildProfile()
       ThreatBarMover = F.Position("BOTTOM", "UIParent", "BOTTOM", -2, 44),
       VOICECHAT = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 254, -18),
       LootFrameMover = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 235, -558),
-      HonorBarMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 520, 5),
+      HonorBarMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 497, 8),
       AlertFrameMover = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 508, -165),
       BNETMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 0, 240),
     }

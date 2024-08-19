@@ -2,46 +2,8 @@ local TYMEUI, F, E, I, V, P, G = unpack((select(2, ...)))
 
 I.Strings = {}
 
-I.Strings.Requirements = {
-  [I.Enum.Requirements.TOXIUI_PROFILE] = "NO_STRING_NEEDED",
-  [I.Enum.Requirements.SL_DISABLED] = "You can't enable this option because a similar module in Shadow & Light is currently turned on. Please disable it to unlock this option.",
-  [I.Enum.Requirements.DARK_MODE_ENABLED] = "NO_STRING_NEEDED",
-  [I.Enum.Requirements.DARK_MODE_DISABLED] = "Only one theme can be activated at the same time. Please disable dark mode",
-  [I.Enum.Requirements.GRADIENT_MODE_ENABLED] = "NO_STRING_NEEDED",
-  [I.Enum.Requirements.GRADIENT_MODE_DISABLED] = "Only one theme can be activated at the same time. Please disable gradient mode",
-  [I.Enum.Requirements.SL_VEHICLE_BAR_DISABLED] = "You can't enable this option because Shadow & Light's Vehicle Bar module is currently turned on. Please disable it to unlock this option.",
-  [I.Enum.Requirements.SL_MINIMAP_COORDS_DISABLED] = "You can't enable this option because Shadow & Light's Minimap Coordinates module is currently turned on. Please disable it to unlock this option.",
-  [I.Enum.Requirements.SL_DECONSTRUCT_DISABLED] = "You can't enable this option because Shadow & Light's Deconstruct module is currently turned on. Please disable it to unlock this option.",
-  [I.Enum.Requirements.ARMORY_DISABLED] = "You can't enable this option because Shadow & Light's Character Armory module is currently turned on. Please disable it to unlock this option.",
-  [I.Enum.Requirements.CHARACTER_SKIN_ENABLED] = "You can't enable this option because you have ElvUI's Character Frame Skin disabled",
-  [I.Enum.Requirements.WT_ENABLED] = "NO_STRING_NEEDED",
-  [I.Enum.Requirements.OLD_FADE_PERSIST_DISABLED] = "ElvUI_GlobalFadePersist is currently installed and enabled. To use this option, please disable ElvUI_GlobalFadePersist, as it interferes with ToxiUI's global fade persist.",
-  [I.Enum.Requirements.DETAILS_LOADED_AND_TXPROFILE] = "NO_STRING_NEEDED",
-  [I.Enum.Requirements.ELVUI_BAGS_ENABLED] = "You can't enable this option because ElvUI's Bag module is currently turned off. Please enable it to unlock this option.",
-  [I.Enum.Requirements.ELVUI_NOT_SKINNED] = "You can't enable this option because a similar module for UnitFrames is currently turned on. Please disable it to unlock this option.",
-  [I.Enum.Requirements.DETAILS_NOT_SKINNED] = "You can't enable this option because a similar module for Details is currently turned on. Please disable it to unlock this option.",
-  [I.Enum.Requirements.OTHER_THEMES_DISABLED] = "You can't enable this option because a similar module for ElvUI is currently turned on. Please disable it to unlock this option.",
-  [I.Enum.Requirements.ELVUI_ACTIONBARS_ENABLED] = "You can't use this module because ElvUI's ActionBars module is currently turned off. Please enable it to unlock this option.",
-  [I.Enum.Requirements.AB_BUDDY_DISABLED] = "You can't use this module because ElvUI_ActionBarBuddy is enabled. Please disable it to unlock this option.",
-  [I.Enum.Requirements.ELTRUISM_COLOR_MODIFIERS_DISABLED] = "You can't use this module because a similar module is currently turned on in EltruismUI. Please disable it to unlock this option.",
-}
-
-I.Strings.RequirementsDebug = {
-  [I.Enum.Requirements.TOXIUI_PROFILE] = "No ToxiUI Profile",
-  [I.Enum.Requirements.SL_DISABLED] = "SL Enabled",
-  [I.Enum.Requirements.DARK_MODE_ENABLED] = "DM Disabled",
-  [I.Enum.Requirements.DARK_MODE_DISABLED] = "DM Enabled",
-  [I.Enum.Requirements.GRADIENT_MODE_ENABLED] = "GM Disabled",
-  [I.Enum.Requirements.GRADIENT_MODE_DISABLED] = "GM Enabled",
-}
-
-I.Strings.ChangelogText = {
-  [I.Enum.ChangelogType.HOTFIX] = "Hotfix - no notes.",
-}
-
 I.Strings.Colors = {
   [I.Enum.Colors.TYMEUI] = "18a8ff", -- #18a8ff
-  [I.Enum.Colors.DETAILS] = "f7f552", -- #f7f552
   [I.Enum.Colors.ELVUI] = "1784d1", -- #1784d1
   [I.Enum.Colors.ERROR] = "ef5350", -- #ef5350
   [I.Enum.Colors.GOOD] = "66bb6a", -- #66bb6a
@@ -63,91 +25,14 @@ I.Strings.Branding = {
   ColorRGBA = F.Table.HexToRGB(I.Strings.Colors[I.Enum.Colors.TYMEUI] .. "ff"),
 
   Links = {
-    Website = "https://toxiui.com",
-    Discord = "https://discord.gg/r85TGUU7zA",
-    WAGuide = "https://toxiui.com/wa",
-    Youtube = "https://www.youtube.com/@ToxiTV",
-    Github = "https://github.com/toxicom/toxiui",
-    WrathArmory = "https://www.curseforge.com/wow/addons/wratharmory-elvui-plugin",
+    Website = "https://foo.com",
+    Discord = "https://discord.gg/foo",
+    WAGuide = "https://foo.com",
+    Youtube = "https://www.youtube.com/foo",
+    Github = "https://github.com/foo",
   },
 }
 
-I.Strings.Deconstruct = {
-  Status = {
-    Title = F.String.Color("Deconstruct", I.Enum.Colors.WHITE),
-    Text = "With Deconstruct enabled, hover over your items\nto easily DISENCHANT/PROSPECT/MILL them.\n\n Current state: %s",
-    Inactive = F.String.Error("Inactive"),
-    Active = F.String.Good("Active"),
-  },
-
-  Label = {
-    [I.Enum.DeconstructState.DISENCHANT] = "DE",
-    [I.Enum.DeconstructState.PROSPECT] = "PROSP",
-    [I.Enum.DeconstructState.MILL] = "MILL",
-  },
-
-  Color = {
-    [I.Enum.DeconstructState.DISENCHANT] = {
-      r = 0 / 255,
-      g = 128 / 255,
-      b = 255 / 255,
-      a = 1,
-    },
-    [I.Enum.DeconstructState.PROSPECT] = {
-      r = 218 / 255,
-      g = 229 / 255,
-      b = 71 / 255,
-      a = 1,
-    },
-    [I.Enum.DeconstructState.MILL] = {
-      r = 71 / 255,
-      g = 229 / 255,
-      b = 155 / 255,
-      a = 1,
-    },
-  },
-}
-
-I.Strings.Classes = {
-  VANILLA = {
-    "WARRIOR",
-    "PALADIN",
-    "HUNTER",
-    "ROGUE",
-    "PRIEST",
-    "SHAMAN",
-    "MAGE",
-    "WARLOCK",
-    "DRUID",
-  },
-  CATA = {
-    "WARRIOR",
-    "PALADIN",
-    "HUNTER",
-    "ROGUE",
-    "PRIEST",
-    "SHAMAN",
-    "MAGE",
-    "WARLOCK",
-    "DRUID",
-    -- Wrath only
-    "DEATHKNIGHT",
-  },
-  RETAIL = {
-    "WARRIOR",
-    "PALADIN",
-    "HUNTER",
-    "ROGUE",
-    "PRIEST",
-    "SHAMAN",
-    "MAGE",
-    "WARLOCK",
-    "DRUID",
-    -- Wrath only
-    "DEATHKNIGHT",
-    -- Retail only
-    "MONK",
-    "DEMONHUNTER",
-    "EVOKER",
-  },
+I.Strings.LayoutConfigs = {
+  [I.Enum.Layouts.Default] = "1 39 0 0 0 4 4 UIParent 0.0 -388.7 -1 ##$$%/&''%)$+$,$ 0 1 0 4 4 UIParent 0.0 -432.2 -1 ##$$%/&''%(#,$ 0 2 0 7 7 UIParent -140.1 68.3 -1 ##$%%/&&'%(#,$ 0 3 0 7 7 UIParent 141.0 68.7 -1 ##$%%/&&'%(#,$ 0 4 1 2 0 MultiBarRight -5.0 0.0 -1 #$$$%/&&'%(#,$ 0 5 1 1 4 UIParent 0.0 0.0 -1 ##$$%/&('%(#,$ 0 6 1 1 7 MultiBar5 0.0 0.0 -1 ##$$%/&('%(#,$ 0 7 0 5 5 UIParent -11.1 -36.5 -1 #$$$%/&''%(#,$ 0 10 0 7 7 UIParent -458.5 228.3 -1 ##$$&('% 0 11 0 7 7 UIParent 10.9 236.6 -1 ##$$&('%,# 0 12 0 4 4 UIParent 0.0 -18.8 -1 ##$$&('% 1 -1 0 7 7 UIParent 7.5 289.2 -1 #($#%# 2 -1 0 2 2 UIParent 0.0 -23.6 -1 ##$#%( 3 0 1 8 7 UIParent -300.0 250.0 -1 $#3# 3 1 0 7 7 UIParent 396.8 245.0 -1 %#3# 3 2 0 7 7 UIParent 398.5 116.2 -1 %#&$3# 3 3 0 0 0 UIParent 0.0 -357.3 -1 '#($)#-#.#/#1$3# 3 4 0 0 0 UIParent 0.0 -356.8 -1 ,%-#.#/#0#1#2( 3 5 0 2 2 UIParent -1908.2 -47.2 -1 &#*$3# 3 6 1 5 5 UIParent 0.0 0.0 -1 -#.#/#4& 3 7 1 4 4 UIParent 0.0 0.0 -1 3# 4 -1 0 4 4 UIParent 3.4 -137.8 -1 # 5 -1 0 7 7 UIParent -419.2 76.1 -1 # 6 0 0 5 3 MinimapCluster -4.0 57.9 -1 ##$#%#&0(()( 6 1 0 4 4 UIParent -385.7 -220.7 -1 ##$$%$'+(')( 7 -1 0 1 1 UIParent 0.8 -72.3 -1 # 8 -1 0 6 6 UIParent 38.3 42.5 -1 #'$<%$&V 9 -1 0 7 7 UIParent -498.0 229.8 -1 # 10 -1 1 0 0 UIParent 16.0 -116.0 -1 # 11 -1 0 1 1 UIParent -466.0 -8.8 -1 # 12 -1 0 5 5 UIParent -59.5 0.8 -1 #;$#%# 13 -1 0 7 7 UIParent 458.3 0.0 -1 ##$#%%&- 14 -1 0 7 7 UIParent 407.4 0.0 -1 ##$#%( 15 0 1 7 7 StatusTrackingBarManager 0.0 0.0 -1 # 15 1 1 7 1 MainStatusTrackingBarContainer 0.0 0.0 -1 # 16 -1 0 6 6 UIParent 489.4 254.0 -1 #( 17 -1 1 1 1 UIParent 0.0 -100.0 -1 ## 18 -1 0 0 0 UIParent 232.0 -47.7 -1 #- 19 -1 1 7 7 UIParent 0.0 0.0 -1 ##",
 }
