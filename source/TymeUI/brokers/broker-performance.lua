@@ -39,11 +39,11 @@ if not LibStub then error("TymeTweak-Performance Data Broker requires LibStub") 
 
 local prevmem, tipshownMem, tipshownLatency = collectgarbage("count")
 local format, modf, floor, GetNetStats, GetFramerate, collectgarbage, lower = format, math.modf, floor, GetNetStats, GetFramerate, collectgarbage, lower
-local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage, GetAddOnInfo, select, sort = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage, GetAddOnInfo, select, sort
-local IsAddOnLoaded, ipairs, insert, print = IsAddOnLoaded, ipairs, table.insert, print
+local UpdateAddOnMemoryUsage, GetAddOnMemoryUsage, GetAddOnInfo, select, sort = UpdateAddOnMemoryUsage, GetAddOnMemoryUsage, C_AddOns.GetAddOnInfo, select, sort
+local IsAddOnLoaded, ipairs, insert, print = C_AddOns.IsAddOnLoaded, ipairs, table.insert, print
 local GameTooltip, AddLine, AddDoubleLine = GameTooltip, AddLine, AddDoubleLine
-local fpsIcon = "Interface\\AddOns\\TymeUI\\media\\fpsicon"
-local msIcon = "Interface\\AddOns\\TymeUI\\media\\msicon"
+local fpsIcon = "Interface\\AddOns\\TymeUI\\Media\\fpsicon"
+local msIcon = "Interface\\AddOns\\TymeUI\\Media\\msicon"
 
 ---------------------
 --> FUNCTIONS
@@ -54,8 +54,8 @@ local addons = {} --main table to manipulate
 local gFrame = CreateFrame("frame")
 gFrame:RegisterEvent("PLAYER_LOGIN")
 gFrame:SetScript("OnEvent", function()
-	for i=1,GetNumAddOns(), 1 do
-		local tester = GetAddOnEnableState(nil, i) and IsAddOnLoaded(i)
+	for i=1,C_AddOns.GetNumAddOns(), 1 do
+		local tester = C_AddOns.GetAddOnEnableState(i) and IsAddOnLoaded(i)
 		if tester then -->check to see if addon is even enabled/loaded
 			local name = select(1, GetAddOnInfo(i))
 			insert(addons, name)
@@ -151,7 +151,7 @@ end)
 --> ONLEAVE FUNCTIONS
 ----------------------
 local GameTooltip = GameTooltip
-if not IsAddOnLoaded(databrokers_name_memory) then
+if not C_AddOns.IsAddOnLoaded(databrokers_name_memory) then
 	function datafps.OnLeave()
 		GameTooltip:SetClampedToScreen(true)
 		GameTooltip:Hide()
@@ -196,7 +196,7 @@ function datalatency.OnClick(self)
 	return
 end
 
-if not IsAddOnLoaded(databrokers_name_memory) then
+if not C_AddOns.IsAddOnLoaded(databrokers_name_memory) then
 	function datafps.OnEnter(self)
 		tipshownMem = self
 		GameTooltip:SetOwner(self, "ANCHOR_NONE")

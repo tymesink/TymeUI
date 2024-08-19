@@ -1,0 +1,12 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Include file='Functions\Load.xml' />
+
+    <Script file='InternalEnum.lua' />
+    <Script file='InternalString.lua' />
+    <Script file='InternalData.lua' />
+
+    <Script file='Core.lua' />
+    <Script file='Profile.lua' />
+    <Script file='StaticPopups.lua' />
+    <Script file='Commands.lua' />
+</Ui>

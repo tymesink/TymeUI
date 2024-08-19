@@ -1,15 +1,17 @@
-## Interface: 100205
+## Interface: 110002
 ## Title: |cff1784d1TymeUI|r
 ## Version: 1.0
 ## Author: Tymesink
 ## SavedVariables: TymeUIDB
-## RequiredDeps: SimpleAddonManager
+## RequiredDeps: SimpleAddonManager,ElvUI
+## DefaultState: Enabled
+## X-Interface: 110002
+## X-Flavor: Mainline
+## X-ElvUIVersion: 13.74
+## X-GitHash: v0.1.0-beta.1
 
-libraries\load.xml
-
-libs.lua
-events.lua
-core.lua
-
-brokers\broker-performance.lua
-brokers\broker-clickCastHelper.lua
+Initialize.lua
+Libraries\Load.xml
+Core\Load.xml
+Modules\Load.xml
+Brokers\Load.xml
