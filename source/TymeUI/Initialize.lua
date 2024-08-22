@@ -1,6 +1,6 @@
 local E, L, V, P, G = unpack(ElvUI)
 local EP = E.Libs.EP
-local addonName, addon = ...
+local AddonName, Engine = ...
 
 local _G = _G
 local find = string.find
@@ -10,45 +10,40 @@ local select = select
 local tonumber = tonumber
 local OKAY = OKAY
 
-local TYMEUI = E:NewModule(addonName, "AceConsole-3.0", "AceTimer-3.0", "AceHook-3.0")
-V.TYMEUI = {}
-P.TYMEUI = {}
-G.TYMEUI = {}
+local TYMEUI = E:NewModule(AddonName, "AceConsole-3.0", "AceTimer-3.0", "AceHook-3.0")
 local F = {}
 local I = {}
 
-addon[1] = TYMEUI
-addon[2] = F
-addon[3] = E
-addon[4] = I
-addon[5] = V.TYMEUI
-addon[6] = P.TYMEUI
-addon[7] = G.TYMEUI
-addon[8] = L
-_G[addonName] = addon
+Engine[1] = TYMEUI
+Engine[2] = F
+Engine[3] = I
+Engine[4] = E
+_G["TymeUI"] = Engine
 
-TYMEUI.AddOnName = addonName
-TYMEUI.GitHash = GetAddOnMetadata(addonName, "X-GitHash")
+TYMEUI.AddOnName = AddonName
+TYMEUI.GitHash = GetAddOnMetadata(AddonName, "X-GitHash")
 TYMEUI.DebugMode = false
 TYMEUI.DevTag = ""
 TYMEUI.DelayedWorldEntered = false
-TYMEUI.MetaFlavor = GetAddOnMetadata(addonName, "X-Flavor")
+TYMEUI.MetaFlavor = GetAddOnMetadata(AddonName, "X-Flavor")
 TYMEUI.ClientBuildVersion = select(4, GetBuildInfo())
-TYMEUI.Version = GetAddOnMetadata(addonName, "Version")
+TYMEUI.Version = GetAddOnMetadata(AddonName, "Version")
 
-TYMEUI.IsVanilla = TYMEUI.MetaFlavor == "Vanilla"
-TYMEUI.IsCata = TYMEUI.MetaFlavor == "Cata"
-TYMEUI.IsRetail = TYMEUI.MetaFlavor == "Mainline"
+local defaults = {
+  profile = {
+      profileModule = {
+          ProfileHasBeenSet = false
+      }
+  }
+}
 
 TYMEUI.Modules = {}
-TYMEUI.Modules.Changelog = TYMEUI:NewModule("Changelog", "AceEvent-3.0", "AceTimer-3.0")
-TYMEUI.Modules.Options = TYMEUI:NewModule("Options")
-TYMEUI.Modules.Skins = TYMEUI:NewModule("Skins", "AceHook-3.0", "AceEvent-3.0")
-TYMEUI.Frame = CreateFrame('Frame')
 
 function TYMEUI:Initialize()
     -- Don't init second time
     if self.initialized then return end
+
+    self.db = LibStub("AceDB-3.0"):New("TymeUIDB", defaults)
 
     -- Call pre init for ourselfs
     self:ModulePreInitialize(self)
@@ -99,6 +94,10 @@ function TYMEUI:Initialize()
   
     -- Lets go!
     self:InitializeModules()
+end
+
+function TYMEUI:OnProfileChanged(event, database, newProfileKey)
+	
 end
   
 EP:HookInitialize(TYMEUI, TYMEUI.Initialize)

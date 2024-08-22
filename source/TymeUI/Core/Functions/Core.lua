@@ -1,45 +1,28 @@
-﻿local TYMEUI, F, E, I, V, P, G = unpack((select(2, ...)))
+﻿local TYMEUI, F, I, E = unpack(TymeUI)
 local LSM = E.Libs.LSM
 
 local _G = _G
 local abs = math.abs
 local COVENANT_COLORS = COVENANT_COLORS
 local CreateFrame = CreateFrame
-local CreateFromMixins = CreateFromMixins
 local error = error
-local FindSpellOverrideByID = FindSpellOverrideByID
 local format = string.format
 local GetAddOnEnableState = (C_AddOns and C_AddOns.GetAddOnEnableState) or GetAddOnEnableState
-local GetItemCount = GetItemCount
-local GetSpecialization = GetSpecialization
-local GetSpecializationInfo = GetSpecializationInfo
-local GetSpellCooldown = (C_Spell and C_Spell.GetSpellCooldown) or GetSpellCooldown
 local GetTime = GetTime
-local gmatch = string.gmatch
-local gsub = string.gsub
 local ipairs = ipairs
 local IsAddOnLoaded = (C_AddOns and C_AddOns.IsAddOnLoaded) or IsAddOnLoaded
-local IsSpellKnownOrOverridesKnown = IsSpellKnownOrOverridesKnown
-local ItemMixin = ItemMixin
-local match = string.match
 local max = math.max
 local min = math.min
 local modf = math.modf
 local next = next
 local pairs = pairs
 local pcall = pcall
-local PlayerHasToy = PlayerHasToy
-local ReloadUI = ReloadUI
 local select = select
 local setmetatable = setmetatable
-local SpellMixin = SpellMixin
-local strsplit = strsplit
 local tcontains = tContains
 local tinsert = table.insert
-local tonumber = tonumber
-local tremove = tremove
+local tremove = table.remove
 local type = type
-local UnitLevel = UnitLevel
 local unpack = unpack
 local xpcall = xpcall
 
@@ -112,20 +95,19 @@ function F.PerfectScale(n)
 end
 
 function F.PixelPerfect()
-	local perfectScale = 768 / E.physicalHeight
-	if E.physicalHeight > 1440 then perfectScale = 0.65 end
+	-- local perfectScale = 768 / E.physicalHeight
+	-- if E.physicalHeight > 1440 then perfectScale = 0.65 end
 
-	return perfectScale
+	-- return perfectScale
+	local perfectScale = 0.6
+    return perfectScale
 end
 
 local baseScale = 768 / 1440 -- 0,5333333333333333
-local baseMulti = 0.64 / baseScale -- 1,2
+local baseMulti = 0.64 / baseScale -- 1.2
 local perfectScale = baseScale / F.PixelPerfect()
 local perfectMulti = baseMulti * perfectScale
 
-function F.HiDpi()
-	return E.physicalHeight / 1440 >= 1
-end
 
 function F.Dpi(value, frac)
 	return F.Round(value * perfectMulti, frac)
@@ -134,17 +116,6 @@ end
 function F.DpiRaw(value)
 	return value * perfectMulti
 end
-
---   function F.FontSizeScaled(value, clamp)
--- 	value = E.db.TYMEUI and E.db.TYMEUI.addons and E.db.TYMEUI.addons.fontScale and (value + E.db.TYMEUI.addons.fontScale) or value
--- 	clamp = (clamp and (E.db.TYMEUI and E.db.TYMEUI.addons and E.db.TYMEUI.addons.fontScale) and (clamp + E.db.TYMEUI.addons.fontScale) or clamp) or 0
--- 	return F.Clamp(F.Clamp(F.Round(value * perfectScale), clamp or 0, 64), 8, 64)
---   end
-
---   function F.FontSize(value)
--- 	value = E.db.TYMEUI and E.db.TYMEUI.addons and E.db.TYMEUI.addons.fontScale and (value + E.db.TYMEUI.addons.fontScale) or value
--- 	return F.Clamp(value, 8, 64)
---   end
 
 function F.Position(anchor1, parent, anchor2, x, y)
 	return format("%s,%s,%s,%d,%d", anchor1, parent, anchor2, F.Dpi(x), F.Dpi(y))
@@ -262,22 +233,6 @@ function F.FastColorGradient(perc, r1, g1, b1, r2, g2, b2)
 	return (r2 * perc) + (r1 * (1 - perc)), (g2 * perc) + (g1 * (1 - perc)), (b2 * perc) + (b1 * (1 - perc))
 end
 
-function F.FontOverride(font)
-	local override = F.GetDBFromPath("TXUI.general.fontOverride")[font]
-	return (override and override ~= "DEFAULT") and override or font
-end
-
-function F.FontStyleOverride(font, style)
-	local override = F.GetDBFromPath("TXUI.general.fontStyleOverride")[font]
-	return (override and override ~= "DEFAULT") and override or style
-end
-
-function F.GetFontShadowOverride(font, shadow)
-	local override = F.GetDBFromPath("TXUI.general.fontShadowOverride")[font]
-	if override ~= nil and override ~= "DEFAULT" then return override end
-	return shadow
-end
-
 function F.RemoveFontTemplate(fs)
 	E.texts[fs] = nil
 end
@@ -292,7 +247,7 @@ function F.GetFontColorFromDB(db, prefix)
 	-- Switch
 	if colorSwitch == "CUSTOM" then
 		fontColor = (useDB and db[prefix .. "FontCustomColor"]) or I.General.DefaultFontCustomColor
-	elseif colorSwitch == "TXUI" then
+	elseif colorSwitch == "TYMEUI" then
 		fontColor = I.Strings.Branding.ColorRGBA
 	elseif colorSwitch == "CLASS" then
 		local classColor = E:ClassColor(E.myclass, true)

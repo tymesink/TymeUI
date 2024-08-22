@@ -1,9 +1,9 @@
-local TYMEUI, F, E, I, V, P, G = unpack((select(2, ...)))
+local TYMEUI, F, I, E = unpack(TymeUI)
 local PF = TYMEUI:GetModule("Profiles")
 
 local next = next
 
-function PF:BuildProfile()
+local BuildElvUIProfile = function()
   -- Setup Local Tables
   local pf = {
     actionbar = {},
@@ -192,7 +192,7 @@ function PF:BuildProfile()
   return pf
 end
 
-function PF:ElvUIProfilePrivate()
+local ElvUIProfilePrivate = function()
   local isBagsEnabled = true
 
   local BAG_ADDONS = { "Bagnon", "BetterBags", "Baggins", "Sorted", "Inventorian", "Baganator", "ArkInventory", "OneBag3", "Combuctor" }
@@ -375,7 +375,7 @@ function PF:ElvUIProfilePrivate()
   })
 end
 
-function PF:ElvUIProfileGlobal()
+local ElvUIProfileGlobal = function()
   F.Table.Crush(E.global, {
     -- General
     general = {
@@ -391,4 +391,29 @@ function PF:ElvUIProfileGlobal()
       },
     },
   })
+end
+
+function PF:MergeElvUIProfile()
+  F.Chat('chat', 'Profiles:MergeElvUIProfile()');
+  local pf = BuildElvUIProfile()
+
+  -- Use Debug output in development mode
+  local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
+  
+  -- Merge Tables
+  crushFnc(E.db, pf)
+
+  -- Set Globals
+  crushFnc(E.global, {
+    uiScaleInformed = true,
+
+    general = {
+      commandBarSetting = "DISABLED",
+      UIScale = F.PixelPerfect(),
+    },
+  })
+
+  ElvUIProfilePrivate()
+  ElvUIProfileGlobal()
+  E:UpdateDB()
 end

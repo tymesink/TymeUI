@@ -1,4 +1,4 @@
-local TYMEUI, F, E, I, V, P, G = unpack((select(2, ...)))
+local TYMEUI, F, I, E = unpack(TymeUI)
 
 local pairs = pairs
 local tonumber, lower, wipe, next = tonumber, strlower, wipe, next

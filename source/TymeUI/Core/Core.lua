@@ -1,4 +1,4 @@
-﻿local TYMEUI, F, E, I, V, P, G = unpack((select(2, ...)))
+﻿local TYMEUI, F, I, E = unpack(TymeUI)
 local _G = _G
 local pairs = pairs
 local xpcall = xpcall
@@ -31,10 +31,6 @@ function TYMEUI:InitializeModules()
 		if module.Initialize then xpcall(module.Initialize, errorhandler, module) end
 	end
 	
-  
-	-- Init Popups
-	self:LoadStaticPopups()
-  
 	-- Init commands
 	self:LoadCommands()
 end

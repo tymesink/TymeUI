@@ -1,3 +1,3 @@
-local TYMEUI, F, E, I, V, P, G = unpack((select(2, ...)))
+local TYMEUI, F, I, E = unpack(TymeUI)
 
 I.Data = {}
