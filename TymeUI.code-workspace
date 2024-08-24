@@ -484,7 +484,17 @@
 			"DropDownList1",
 			"ToggleClickBindingFrame",
 			"SettingsPanel",
-			"COVENANT_COLORS"
+			"COVENANT_COLORS",
+			"DevTools_DumpCommand",
+			"ID",
+			"FCF_GetChatWindowInfo",
+			"FCF_SetChatWindowFontSize",
+			"FCF_UnDockFrame",
+			"FCF_SetWindowName",
+			"FCF_DockFrame",
+			"FCF_SetLocked",
+			"FCF_SavePositionAndDimensions",
+			"TRADE"
 		],
 		"Lua.runtime.version": "Lua 5.1",
 		"Lua.runtime.builtin": {

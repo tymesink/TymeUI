@@ -1,9 +1,21 @@
 local TYMEUI, F, I, E = unpack(TymeUI)
 local PF = TYMEUI:GetModule("Profiles")
 
-local next = next
+local _G = _G
+local FCF_SetLocked = FCF_SetLocked
+local FCF_DockFrame, FCF_UnDockFrame = FCF_DockFrame, FCF_UnDockFrame
+local FCF_SavePositionAndDimensions = FCF_SavePositionAndDimensions
+local FCF_GetChatWindowInfo = FCF_GetChatWindowInfo
+local FCF_StopDragging = FCF_StopDragging
+local FCF_SetChatWindowFontSize = FCF_SetChatWindowFontSize
+local LeftChatToggleButton = _G.LeftChatToggleButton
+local loot = LOOT:match"^.?[\128-\191]*"
+local trade = TRADE:match"^.?[\128-\191]*"
+local ElvUIVersion = tonumber(E.version)
 
-local BuildElvUIProfile = function()
+local SetupProfile = function()
+  local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
+
   -- Setup Local Tables
   local pf = {
     actionbar = {},
@@ -26,7 +38,6 @@ local BuildElvUIProfile = function()
       units = {},
     },
   }
-
 
   -- Setup Unit Tables & Disable Info Panel
   for _, unit in
@@ -59,7 +70,6 @@ local BuildElvUIProfile = function()
   end
 
   -- Setup DataBars Tables & Disable DataBars
-  --local databars = { "experience", "reputation", "honor", "threat", "azerite", "petExperience" }
   local databars = { "experience", "reputation", "azerite", "petExperience" }
   for _, databar in next, databars do
     pf.databars[databar] = {
@@ -71,39 +81,51 @@ local BuildElvUIProfile = function()
   }
 
   -- Setup DataText Panels Tables & Disable Panels
-  --local panels = { "LeftChatDataPanel", "RightChatDataPanel", "MinimapPanel" }
-  local panels = { "MinimapPanel" }
-  for _, panel in next, panels do
-    pf.datatexts.panels[panel] = {
-      enable = false,
-    }
-  end
+  pf.datatexts.panels = {
+    MinimapPanel = {
+      enable = false
+    },
+    RightChatDataPanel = {
+      "Bags",
+      "Volume",
+      "DPS"
+    },
+    LeftChatDataPanel = {
+      [3] = "Currencies"
+    },
+  }
 
   -- Movers
-  F.Table.Crush(
-    pf.movers,
-    {
-      -- F.Position(1, 2, 3)
-      -- 1 => Anchor position of SELECTED FRAME
-      -- 2 => Anchor Parent
-      -- 3 => Anchor position of PARENT FRAME
+  crushFnc(pf.movers, {
+    -- F.Position(1, 2, 3)
+    -- 1 => Anchor position of SELECTED FRAME
+    -- 2 => Anchor Parent
+    -- 3 => Anchor position of PARENT FRAME
 
-      AddonCompartmentMover = F.Position("TOPRIGHT", "UIParent", "TOPRIGHT", -212,-28),
-      ThreatBarMover = F.Position("BOTTOM", "UIParent", "BOTTOM", -2, 44),
-      VOICECHAT = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 254, -18),
-      LootFrameMover = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 235, -558),
-      HonorBarMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 497, 8),
-      AlertFrameMover = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 508, -165),
-      BNETMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 0, 240),
-    }
-  )
+    AddonCompartmentMover = F.Position("TOPRIGHT", "ElvUIParent", "TOPRIGHT", -213,-26),
+    BNETMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 0, 310),
+    VOICECHAT = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 261, -32),
+    HonorBarMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 619, 7),
+    LeftChatMover = F.Position("BOTTOMLEFT", "ElvUIParent", "BOTTOMLEFT", 0, 4),
+    GMMover = F.Position("BOTTOMLEFT", "ElvUIParent", "BOTTOMLEFT", 0, 374),
+    AlertFrameMover = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 493, -226),
+    PowerBarContainerMover = F.Position("BOTTOM", "UIParent", "BOTTOM", 9, 337),
+    PrivateAurasMover = F.Position("TOPRIGHT", "UIParent", "TOPRIGHT", -281, -278),
+    ElvUIBagMover = F.Position("BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -301, 262),
+    AltPowerBarMover = F.Position("TOP", "UIParent", "TOP", 1, -50),
+    ThreatBarMover = F.Position("BOTTOM", "UIParent", "BOTTOM", -2, 57),
+    RightChatMover = F.Position("BOTTOMRIGHT", "ElvUIParent", "BOTTOMRIGHT", 0, 4),
+    LootFrameMover = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 424,-557),
+    QueueStatusMover = F.Position("BOTTOM", "UIParent", "BOTTOM", -2, 101),
+  })
 
   -- General
-  F.Table.Crush(pf.general, {
+  crushFnc(pf.general, {
     -- General AFK Mode
     afk = false,
     afkChat = false,
 	  afkSpin = false,
+    taintLog = true,
     interruptAnnounce = 'NONE',
 	  autoRepair = 'NONE',
     autoTrackReputation = false,
@@ -145,16 +167,17 @@ local BuildElvUIProfile = function()
     },
 
     queueStatus = {
-      enable = false,
+      enable = true,
     },
   })
 
 
   -- Bags
-  F.Table.Crush(pf.chat, {
+  crushFnc(pf.chat, {
     panelSnapLeftID = 1,
-    panelSnapRightID = 4,
     tabSelector = "BOX",
+    panelWidth = 500,
+    panelHeight = 230,
     panelColor = {
       r = 0,
       g = 0.2274509966373444,
@@ -165,7 +188,7 @@ local BuildElvUIProfile = function()
 
 
   -- Bags
-  F.Table.Crush(pf.bags, {
+  crushFnc(pf.bags, {
     -- Bags Options
     useBlizzardCleanup = false,
     clearSearchOnClose = true,
@@ -187,12 +210,27 @@ local BuildElvUIProfile = function()
   pf.dbConverted = E.version
   pf.actionbar.convertPages = false -- just don't !
   pf.convertPages = true -- don't you dare fuck the action bars up again
-  pf.general.taintLog = false
+  pf.general.taintLog = true
   -- ! --
-  return pf
+  
+  -- Use Debug output in development mode
+  
+
+  -- Merge Tables
+  crushFnc(E.db, pf)
+
+  -- Set Globals
+  crushFnc(E.global, {
+    uiScaleInformed = true,
+
+    general = {
+      commandBarSetting = "DISABLED",
+      UIScale = F.PixelPerfect(),
+    },
+  })
 end
 
-local ElvUIProfilePrivate = function()
+local SetupProfilePrivate = function()
   local isBagsEnabled = true
 
   local BAG_ADDONS = { "Bagnon", "BetterBags", "Baggins", "Sorted", "Inventorian", "Baganator", "ArkInventory", "OneBag3", "Combuctor" }
@@ -202,13 +240,15 @@ local ElvUIProfilePrivate = function()
   end
 
   F.Table.Crush(E.private, {
+    
+    install_complete = ElvUIVersion,
 
     general = {
       raidUtility = false,
       totemTracker = false,
       lootRoll = false,
-      queueStatus = false,
-      worldMap = false,
+      queueStatus = true,
+      worldMap = true,
       minimap = {
         enable = false
       },
@@ -264,8 +304,8 @@ local ElvUIProfilePrivate = function()
 	    checkBoxSkin = true,
       parchmentRemoverEnable = false,
       blizzard = {
-        enable = false,
-        eventLog = false,
+        enable = true,
+        eventLog = true,
         misc = false,
         blizzardOptions = false,
         petbattleui = false,
@@ -273,11 +313,11 @@ local ElvUIProfilePrivate = function()
         loot = false,
         covenantPreview = false,
         inspect = false,
-        debug = false,
+        debug = true,
         lfg = false,
         tooltip = false,
         bmah = false,
-        worldmap = false,
+        worldmap = true,
         questTimers = false,
         tutorials = false,
         addonManager = false,
@@ -375,12 +415,12 @@ local ElvUIProfilePrivate = function()
   })
 end
 
-local ElvUIProfileGlobal = function()
+local SetuProfileGlobal = function()
   F.Table.Crush(E.global, {
     -- General
     general = {
       ultrawide = false,
-
+      UIScale = 0.6,
       WorldMapCoordinates = {
         position = "BOTTOMRIGHT",
       },
@@ -393,27 +433,39 @@ local ElvUIProfileGlobal = function()
   })
 end
 
-function PF:MergeElvUIProfile()
-  F.Chat('chat', 'Profiles:MergeElvUIProfile()');
-  local pf = BuildElvUIProfile()
+local function SetupChat()
+	for _, name in ipairs(_G.CHAT_FRAMES) do
+		local frame = _G[name]
+		local id = frame:GetID()
+		local chatName = FCF_GetChatWindowInfo(id)
 
-  -- Use Debug output in development mode
-  local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
-  
-  -- Merge Tables
-  crushFnc(E.db, pf)
+		FCF_SetChatWindowFontSize(nil, frame, 14)
 
-  -- Set Globals
-  crushFnc(E.global, {
-    uiScaleInformed = true,
+		-- move ElvUI default loot frame to the left chat, so that Recount/Skada can go to the right chat.
+		if id == 4 and (chatName == (LOOT..' / '..TRADE) or chatName == (loot..' / '..trade)) then
+			FCF_UnDockFrame(frame)
+			frame:ClearAllPoints()
+			frame:Point('BOTTOMLEFT', LeftChatToggleButton, 'TOPLEFT', 1, 3)
+			FCF_SetWindowName(frame, 'Loot')
+			FCF_DockFrame(frame)
+			FCF_SetLocked(frame, 1)
+			frame:Show()
+		end
+		if frame:GetLeft() then
+			FCF_SavePositionAndDimensions(frame)
+			FCF_StopDragging(frame)
+		end
+	end
+end
 
-    general = {
-      commandBarSetting = "DISABLED",
-      UIScale = F.PixelPerfect(),
-    },
-  })
+function PF:LoadElvUIProfile()
+  F.Chat('chat', 'Load ElvUI Profile');
 
-  ElvUIProfilePrivate()
-  ElvUIProfileGlobal()
+  E:SetupCVars(true)
+  E:SetupChat(true)
+  SetupProfile()
+  SetupProfilePrivate()
+  SetuProfileGlobal()
+  SetupChat()
   E:UpdateDB()
 end

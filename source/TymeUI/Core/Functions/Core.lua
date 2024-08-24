@@ -118,7 +118,7 @@ function F.DpiRaw(value)
 end
 
 function F.Position(anchor1, parent, anchor2, x, y)
-	return format("%s,%s,%s,%d,%d", anchor1, parent, anchor2, F.Dpi(x), F.Dpi(y))
+	return format("%s,%s,%s,%d,%d", anchor1, parent, anchor2, x, y)
 end
 
 function F.Clamp(value, s, b)

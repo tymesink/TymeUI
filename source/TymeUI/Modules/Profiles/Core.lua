@@ -4,26 +4,42 @@ local PF = TYMEUI:NewModule("Profiles", "AceHook-3.0")
 PF.db = {}
 
 function TYMEUI:HandleResetProfileCommand(msg)
-  self.db.ProfileHasBeenSet = false
-  TYMEUI:StaticPopup_ReloadUI()
+  TYMEUI:StaticPopup_ResetProfile()
 end
 
 function PF:Initialize()
   -- Don't init second time
   if self.Initialized then return end
-  F.Chat('chat', 'Profiles:Initialize()');
+  TYMEUI:RegisterChatCommand("resetprofile", "HandleResetProfileCommand")
+
   PF.db = TYMEUI.db.profile.profileModule
-  
   local profileSet = self.db.ProfileHasBeenSet
   if profileSet == nil or profileSet == false then
-    self:MergeElvUIProfile()
+    F.Chat('chat', 'Setting profiles...');
+    
+    
+    if F.IsAddOnEnabled('ElvUI') then
+      self:LoadElvUIProfile()
+    end
+
+    if F.IsAddOnEnabled('Details') then
+      self:LoadDetailsProfile()
+    end
+
+    if F.IsAddOnEnabled('Narcissus') then
+      self:LoadNarcissusProfile()
+    end
+    
+    if F.IsAddOnEnabled('EditModeExpanded') then
+      self:LoadEditModeExpandedProfile()
+    end
+
     self.db.ProfileHasBeenSet = true
     TYMEUI:StaticPopup_ReloadUI()
   end
-  
-  TYMEUI:RegisterChatCommand("resetprofile", "HandleResetProfileCommand")
 
   -- We are done, hooray!
+  F.Chat('chat', 'Profiles:Initialized()');
   self.Initialized = true
 end
 

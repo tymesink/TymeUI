@@ -101,6 +101,7 @@
         "FCF_ResetChatWindows",
         "FCF_SetLocked",
         "FCF_SetWindowName",
+        "FCF_GetChatWindowInfo",
         "ChatFrame_RemoveAllMessageGroups",
         "ChatFrame_RemoveChannel",
         "ChatFrame_AddMessageGroup",
