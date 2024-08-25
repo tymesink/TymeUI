@@ -5,6 +5,10 @@ local _G = _G
 
 Profiles.RegisteredProfiles = {}
 
+function TYMEUI:HandleResetProfileCommand(msg)
+	TYMEUI:StaticPopup_ResetProfile()
+end
+
 local function errorhandler(err)
 	return _G.geterrorhandler()(err)
 end
@@ -63,6 +67,7 @@ function Profiles:Initialize()
 	-- Don't init second time
 	if self.Initialized then return end
 	
+	TYMEUI:RegisterChatCommand("resetprofile", "HandleResetProfileCommand")
 	Profiles.db = TYMEUI.db.profile.profileModule
 
 	local reloadui = false;

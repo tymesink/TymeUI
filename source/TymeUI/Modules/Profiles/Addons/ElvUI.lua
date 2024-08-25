@@ -208,7 +208,7 @@ local SetupProfile = function()
 
 	crushFnc(pf.chat, {
 		panelSnapLeftID = 1,
-		tabSelector = "BOX",
+		tabSelector = 'BOX',
 		panelWidth = 475,
 		panelHeight = 230,
 		panelColor = {
@@ -217,6 +217,25 @@ local SetupProfile = function()
 			b = 0.2000000178813934,
 			a = 0.3190101981163025,
 		},
+		tabSelectorColor = {
+			r = 0.09,
+			g = 0.51,
+			b = 0.82,
+		},
+		customTimeColor = {
+			b = 0.5098039507865906,
+			g = 0.7019608020782471,
+			r = 0,
+		},
+		timeStampFormat = "%I:%M:%S %p ",
+		timeStampLocalTime = true,
+		channelAlerts = {
+			PARTY = "pop2",
+			GUILD = "kachink",
+			INSTANCE = "doublehit",
+		},
+		keywords = "Court\nKort\nVayne\nBrewshot",
+		historySize = 15,
 	})
 
 	crushFnc(pf.bags, {
@@ -625,7 +644,7 @@ local function SetupChat()
 		local id = frame:GetID()
 		local chatName = FCF_GetChatWindowInfo(id)
 
-		FCF_SetChatWindowFontSize(nil, frame, 14)
+		FCF_SetChatWindowFontSize(nil, frame, 13)
 
 		-- move ElvUI default loot frame to the left chat, so that Recount/Skada can go to the right chat.
 		if id == 4 and (chatName == (LOOT .. ' / ' .. TRADE) or chatName == (loot .. ' / ' .. trade)) then

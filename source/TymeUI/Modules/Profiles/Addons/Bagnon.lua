@@ -8,7 +8,7 @@ module.Enabled = true;
 module.Initialized = false;
 
 function module:LoadProfile()
-    profileDb.global.inventory.enabled = true
+    profileDb.global.inventory.enabled = false
 end
 
 function module:Initialize()

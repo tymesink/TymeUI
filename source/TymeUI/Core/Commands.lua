@@ -35,7 +35,6 @@ function TYMEUI:HandleOptionsChatCommand(msg)
 end
 
 function TYMEUI:LoadCommands()
-    F.Chat('chat', 'Core/Commands.lua => LoadCommands')
     self:RegisterChatCommand("addon", "HandleAddonsChatCommand")
     self:RegisterChatCommand("addons", "HandleAddonsChatCommand")
     self:RegisterChatCommand("rl", "HandleReloadUIChatCommand")
