@@ -494,7 +494,8 @@
 			"FCF_DockFrame",
 			"FCF_SetLocked",
 			"FCF_SavePositionAndDimensions",
-			"TRADE"
+			"TRADE",
+			"MP"
 		],
 		"Lua.runtime.version": "Lua 5.1",
 		"Lua.runtime.builtin": {

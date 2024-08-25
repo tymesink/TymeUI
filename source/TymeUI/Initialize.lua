@@ -32,8 +32,7 @@ TYMEUI.Version = GetAddOnMetadata(AddonName, "Version")
 local defaults = {
   profile = {
       profileModule = {
-          ElvUIProfileHasBeenSet = false,
-          ProfileHasBeenSet = false
+          Initialized = false,
       }
   }
 }

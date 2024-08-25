@@ -1,5 +1,9 @@
 local TYMEUI, F, I, E = unpack(TymeUI)
-local PF = TYMEUI:GetModule("Profiles")
+local Profiles = TYMEUI:GetModule("Profiles")
+local module = TYMEUI:NewModule("ElvUIProfile", "AceHook-3.0")
+local profileAddonName = 'ElvUI'
+module.Enabled = true;
+module.Initialized = false;
 
 local _G = _G
 local FCF_DockFrame, FCF_UnDockFrame = FCF_DockFrame, FCF_UnDockFrame
@@ -631,10 +635,29 @@ local function SetupChat()
 	end
 end
 
-function PF:LoadElvUIProfile()
-	F.Chat('chat', 'Load ElvUI Profile');
+function module:LoadProfile()
 	SetupProfile()
 	SetupProfilePrivate()
 	SetuProfileGlobal()
 	SetupChat()
 end
+
+function module:Initialize()
+    -- Don't init second time
+    if not self.Enabled then
+        F.Chat('chat', self:GetName()..' is not enabled.');
+		return
+    end
+
+    if self.Initialized then return end
+
+    if Profiles:IsAddOnLoaded(profileAddonName, E.db) then
+        self:LoadProfile()
+    end
+    
+    -- We are done, hooray!
+    self.Initialized = true
+    F.Chat('chat', self:GetName()..':Initialized()');
+end
+
+Profiles:RegisterProfile(module)
