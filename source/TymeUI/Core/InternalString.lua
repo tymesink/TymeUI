@@ -17,6 +17,9 @@ I.Strings.Colors = {
   [I.Enum.Colors.BETA] = "1eff00", -- #1eff00
 }
 
+I.Strings.AddonName = "TymeUI"
+I.Strings.AddonProfileKey = TYMEUI.AddOnName..'-'..E.mynameRealm
+
 I.Strings.Branding = {
   Title = "|cffffffffToxi|r|cff" .. I.Strings.Colors[I.Enum.Colors.TYMEUI] .. "UI|r",
 

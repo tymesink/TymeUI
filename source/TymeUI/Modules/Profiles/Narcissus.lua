@@ -7,6 +7,7 @@ function PF:LoadNarcissusProfile()
     if db then
         db.AFKScreen = true
         db.AKFScreenDelay = true
+        db.ShowMinimapButton = false
     else
         F.Chat('chat', 'NarcissusDB is not available.')
     end

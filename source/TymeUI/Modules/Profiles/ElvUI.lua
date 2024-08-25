@@ -2,435 +2,617 @@ local TYMEUI, F, I, E = unpack(TymeUI)
 local PF = TYMEUI:GetModule("Profiles")
 
 local _G = _G
-local FCF_SetLocked = FCF_SetLocked
 local FCF_DockFrame, FCF_UnDockFrame = FCF_DockFrame, FCF_UnDockFrame
-local FCF_SavePositionAndDimensions = FCF_SavePositionAndDimensions
 local FCF_GetChatWindowInfo = FCF_GetChatWindowInfo
-local FCF_StopDragging = FCF_StopDragging
 local FCF_SetChatWindowFontSize = FCF_SetChatWindowFontSize
-local LeftChatToggleButton = _G.LeftChatToggleButton
-local loot = LOOT:match"^.?[\128-\191]*"
-local trade = TRADE:match"^.?[\128-\191]*"
-local ElvUIVersion = tonumber(E.version)
+local loot = LOOT:match "^.?[\128-\191]*"
+local trade = TRADE:match "^.?[\128-\191]*"
+local ACTION_SLOTS = _G.NUM_PET_ACTION_SLOTS or 10
+local STANCE_SLOTS = _G.NUM_STANCE_SLOTS or 10
 
 local SetupProfile = function()
-  local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
+	local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
 
-  -- Setup Local Tables
-  local pf = {
-    actionbar = {},
-    auras = {
-      buffs = {},
-      debuffs = {},
-    },
-    bags = {},
-    chat = {},
-    cooldown = {},
-    databars = {},
-    datatexts = {
-      panels = {},
-    },
-    general = {},
-    movers = {},
-    tooltip = {},
-    unitframe = {
-      colors = {},
-      units = {},
-    },
-  }
+	-- Setup Local Tables
+	local pf = {
+		actionbar = {},
+		auras = {
+			buffs = {},
+			debuffs = {},
+		},
+		bags = {},
+		chat = {},
+		cooldown = {},
+		databars = {},
+		datatexts = {
+			panels = {},
+		},
+		general = {},
+		nameplates = {},
+		movers = {},
+		tooltip = {},
+		unitframe = {
+			colors = {},
+			units = {},
+		},
+	}
 
-  -- Setup Unit Tables & Disable Info Panel
-  for _, unit in
-    next,
-    {
-      "player",
-      "target",
-      "targettarget",
-      "targettargettarget",
-      "focus",
-      "focustarget",
-      "pet",
-      "pettarget",
-      "boss",
-      "arena",
-      "party",
-      "raid1",
-      "raid2",
-      "raid3",
-      "raidpet",
-      "tank",
-      "assist",
-    }
-  do
-    pf.unitframe.units[unit] = {
-      infoPanel = {
-        enable = false,
-      },
-    }
-  end
+	-- Setup Unit Tables & Disable Info Panel
+	for _, unit in
+	next,
+	{
+		"player",
+		"target",
+		"targettarget",
+		"targettargettarget",
+		"focus",
+		"focustarget",
+		"pet",
+		"pettarget",
+		"boss",
+		"arena",
+		"party",
+		"raid1",
+		"raid2",
+		"raid3",
+		"raidpet",
+		"tank",
+		"assist",
+	}
+	do
+		pf.unitframe.units[unit] = {
+			infoPanel = {
+				enable = false,
+			},
+		}
+	end
 
-  -- Setup DataBars Tables & Disable DataBars
-  local databars = { "experience", "reputation", "azerite", "petExperience" }
-  for _, databar in next, databars do
-    pf.databars[databar] = {
-      enable = false,
-    }
-  end
-  pf.databars.threat = {
-    width = 500
-  }
+	crushFnc(pf.databars, {
+		statusbar = 'Rain',
+		customTexture = true,
+		experience = {
+			enable = true,
+			width = 515,
+			height = 12,
+			showBubbles = true
+		},
+		reputation = {
+			enable = true,
+			width = 222,
+			height = 10,
+			showBubbles = true
+		},
+		threat = {
+			enable = true,
+			width = 140
+		},
+		honor = {
+			enable = true,
+			showBubbles = true
+		},
+		azerite = {
+			enable = false
+		},
+		petExperience = {
+			enable = false
+		}
+	})
 
-  -- Setup DataText Panels Tables & Disable Panels
-  pf.datatexts.panels = {
-    MinimapPanel = {
-      enable = false
-    },
-    RightChatDataPanel = {
-      "Bags",
-      "Volume",
-      "DPS"
-    },
-    LeftChatDataPanel = {
-      [3] = "Currencies"
-    },
-  }
+	crushFnc(pf.datatexts, {
+		panels = {
+			MinimapPanel = {
+				enable = false
+			},
+			RightChatDataPanel = {
+				"Bags",
+				"Volume",
+				"DPS"
+			},
+			LeftChatDataPanel = {
+				[3] = "Currencies"
+			}
+		}
+	})
 
-  -- Movers
-  crushFnc(pf.movers, {
-    -- F.Position(1, 2, 3)
-    -- 1 => Anchor position of SELECTED FRAME
-    -- 2 => Anchor Parent
-    -- 3 => Anchor position of PARENT FRAME
+	crushFnc(pf.movers, {
+		-- F.Position(1, 2, 3)
+		-- 1 => Anchor position of SELECTED FRAME
+		-- 2 => Anchor Parent
+		-- 3 => Anchor position of PARENT FRAME
 
-    AddonCompartmentMover = F.Position("TOPRIGHT", "ElvUIParent", "TOPRIGHT", -213,-26),
-    BNETMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 0, 310),
-    VOICECHAT = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 261, -32),
-    HonorBarMover = F.Position("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 619, 7),
-    LeftChatMover = F.Position("BOTTOMLEFT", "ElvUIParent", "BOTTOMLEFT", 0, 4),
-    GMMover = F.Position("BOTTOMLEFT", "ElvUIParent", "BOTTOMLEFT", 0, 374),
-    AlertFrameMover = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 493, -226),
-    PowerBarContainerMover = F.Position("BOTTOM", "UIParent", "BOTTOM", 9, 337),
-    PrivateAurasMover = F.Position("TOPRIGHT", "UIParent", "TOPRIGHT", -281, -278),
-    ElvUIBagMover = F.Position("BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -301, 262),
-    AltPowerBarMover = F.Position("TOP", "UIParent", "TOP", 1, -50),
-    ThreatBarMover = F.Position("BOTTOM", "UIParent", "BOTTOM", -2, 57),
-    RightChatMover = F.Position("BOTTOMRIGHT", "ElvUIParent", "BOTTOMRIGHT", 0, 4),
-    LootFrameMover = F.Position("TOPLEFT", "UIParent", "TOPLEFT", 424,-557),
-    QueueStatusMover = F.Position("BOTTOM", "UIParent", "BOTTOM", -2, 101),
-  })
+		AddonCompartmentMover = F.Position('TOPRIGHT', 'ElvUIParent', 'TOPRIGHT', -215, -28),
+		AltPowerBarMover = F.Position('TOP', 'ElvUIParent', 'TOP', 0, -53),
+		BelowMinimapContainerMover = F.Position('TOPRIGHT', 'ElvUIParent', 'TOPRIGHT', -1, -262),
+		BNETMover = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 0, 208),
+		BossButton = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 214, 237),
+		ElvAB_1 = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 191),
+		ElvAB_2 = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 149),
+		ElvAB_3 = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', -148, 60),
+		ElvAB_4 = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 148, 60),
+		ElvAB_6 = F.Position('BOTTOMRIGHT', 'ElvUIParent', 'BOTTOMRIGHT', 0, 295),
+		ElvUIBagMover = F.Position('BOTTOMRIGHT', 'ElvUIParent', 'BOTTOMRIGHT', -274, 257),
+		ExperienceBarMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 135),
+		GMMover = F.Position('TOPLEFT', 'ElvUIParent', 'TOPLEFT', 251, -21),
+		HonorBarMover = F.Position('BOTTOMRIGHT', 'ElvUIParent', 'BOTTOMRIGHT', -477, 7),
+		LeftChatMover = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 0, 3),
+		MicrobarMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 0),
+		PetAB = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 235),
+		PowerBarContainerMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 306),
+		PrivateAurasMover = F.Position('TOPRIGHT', 'ElvUIParent', 'TOPRIGHT', -217, -211),
+		QueueStatusMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 95),
+		ReputationBarMover = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 477, 7),
+		RightChatMover = F.Position('BOTTOMRIGHT', 'ElvUIParent', 'BOTTOMRIGHT', 0, 3),
+		ShiftAB = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 146, 353),
+		ThreatBarMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', -625, 261),
+		TooltipMover = F.Position('TOPLEFT', 'ElvUIParent', 'TOPLEFT', 510, -34),
+		TotemTrackerMover = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 417, 27),
+		VehicleLeaveButton = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 552, 230),
+		ZoneAbility = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 594, 108)
 
-  -- General
-  crushFnc(pf.general, {
-    -- General AFK Mode
-    afk = false,
-    afkChat = false,
-	  afkSpin = false,
-    taintLog = true,
-    interruptAnnounce = 'NONE',
-	  autoRepair = 'NONE',
-    autoTrackReputation = false,
-    autoAcceptInvite = false,
-    hideErrorFrame = true,
-    hideZoneText = false,
-    enhancedPvpMessages = true,
-    objectiveFrameHeight = 480,
-    objectiveFrameAutoHide = true,
-    objectiveFrameAutoHideInKeystone = false,
-    topPanel = false,
-    topPanelSettings = {
-      transparent = true,
-      height = 22,
-      width = 0
-    },
-    bottomPanel = true,
-    bottomPanelSettings = {
-      transparent = true,
-      height = 28,
-      width = 0
-    },
-    resurrectSound = true,
-    stickyFrames = false,
-    talkingHeadFrameBackdrop = true,
+	})
 
-    -- General Colors
-    backdropcolor = F.Table.HexToRGB("#1a1a1a"),
-    backdropfadecolor = F.Table.HexToRGB("#292929CC"),
-    bordercolor = F.Table.HexToRGB("#000000"),
+	crushFnc(pf.general, {
+		-- General AFK Mode
+		afk = false,
+		afkChat = false,
+		afkSpin = false,
+		taintLog = false,
+		interruptAnnounce = 'NONE',
+		autoRepair = 'NONE',
+		autoTrackReputation = true,
+		autoAcceptInvite = false,
+		hideErrorFrame = true,
+		hideZoneText = false,
+		enhancedPvpMessages = true,
+		objectiveFrameHeight = 480,
+		objectiveFrameAutoHide = true,
+		objectiveFrameAutoHideInKeystone = false,
+		topPanel = false,
+		topPanelSettings = {
+			transparent = true,
+			height = 22,
+			width = 0
+		},
+		bottomPanel = true,
+		bottomPanelSettings = {
+			transparent = true,
+			height = 28,
+			width = 0
+		},
+		resurrectSound = true,
+		stickyFrames = false,
+		talkingHeadFrameBackdrop = true,
 
-    -- AltPowerBar
-    altPowerBar = {
-      enable = false,
-    },
+		-- General Colors
+		backdropcolor = F.Table.HexToRGB("#1a1a1a"),
+		backdropfadecolor = F.Table.HexToRGB("#292929CC"),
+		bordercolor = F.Table.HexToRGB("#000000"),
 
-    privateAuras = {
-      enable = true,
-    },
+		-- AltPowerBar
+		altPowerBar = {
+			enable = false,
+		},
 
-    queueStatus = {
-      enable = true,
-    },
-  })
+		privateAuras = {
+			enable = true,
+		},
 
+		queueStatus = {
+			enable = true,
+		},
+	})
 
-  -- Bags
-  crushFnc(pf.chat, {
-    panelSnapLeftID = 1,
-    tabSelector = "BOX",
-    panelWidth = 500,
-    panelHeight = 230,
-    panelColor = {
-      r = 0,
-      g = 0.2274509966373444,
-      b = 0.2000000178813934,
-      a = 0.3190101981163025,
-    },
-  })
+	crushFnc(pf.chat, {
+		panelSnapLeftID = 1,
+		tabSelector = "BOX",
+		panelWidth = 475,
+		panelHeight = 230,
+		panelColor = {
+			r = 0,
+			g = 0.2274509966373444,
+			b = 0.2000000178813934,
+			a = 0.3190101981163025,
+		},
+	})
 
+	crushFnc(pf.bags, {
+		useBlizzardCleanup = false,
+		clearSearchOnClose = false,
+		junkIcon = false,
+		moneyCoins = false,
+		scrapIcon = false,
+		showBindType = false,
+		vendorGrays = {
+			enable = false,
+		},
+		bagBar = {
+			enable = true,
+			showBackdrop = true,
+		},
+		spinner = {
+			enable = true,
+		},
+	})
 
-  -- Bags
-  crushFnc(pf.bags, {
-    -- Bags Options
-    useBlizzardCleanup = false,
-    clearSearchOnClose = true,
-    junkIcon = true,
-    moneyCoins = false,
-    scrapIcon = true,
-    showBindType = true,
-    vendorGrays = {
-      enable = false,
-    },
+	crushFnc(pf.actionbar, {
+		chargeCooldown = true,
+		useDrawSwipeOnCharges = true,
+		flashAnimation = true,
+		transparent = true,
+		convertPages = false, -- just don't !
+		bar1 = {
+			enabled = true,
+			backdrop = false,
+			buttonSize = 42,
+			buttons = 12,
+			buttonsPerRow = 12,
+		},
+		bar2 = {
+			enabled = true,
+			backdrop = false,
+			buttonSize = 42,
+			buttons = 12,
+			buttonsPerRow = 12,
+		},
+		bar3 = {
+			enabled = true,
+			backdrop = false,
+			buttonsPerRow = 6,
+			buttonSize = 36,
+			buttons = 12
+		},
+		bar4 = {
+			enabled = true,
+			backdrop = false,
+			buttonsPerRow = 6,
+			buttonSize = 36,
+			buttons = 12
+		},
+		bar5 = {
+			enabled = false,
+		},
+		bar6 = {
+			enabled = true,
+			backdrop = false,
+			buttonSpacing = 2,
+			buttonsPerRow = 1,
+			buttonSize = 40,
+			buttons = 12
+		},
+		bar7 = {
+			enabled = false,
+			buttonSize = 36,
+		},
+		bar8 = {
+			enabled = false,
+			buttonSize = 36
+		},
+		bar9 = {
+			enabled = false,
+			buttonSize = 36
+		},
+		bar10 = {
+			enabled = false,
+			buttonSize = 36
+		},
+		bar11 = {
+			enabled = false,
+			buttonSize = 36
+		},
+		bar12 = {
+			enabled = false,
+			buttonSize = 36
+		},
+		bar13 = {
+			enabled = false,
+			buttonSize = 36
+		},
+		bar14 = {
+			enabled = false,
+			buttonSize = 36
+		},
+		bar15 = {
+			enabled = false,
+			buttonSize = 36
+		},
+		barPet = {
+			enabled         = true,
+			backdrop        = false,
+			buttonsPerRow   = ACTION_SLOTS,
+			buttons         = ACTION_SLOTS,
+			buttonSize      = 32,
+			buttonHeight    = 32,
+			buttonSpacing   = 2,
+			backdropSpacing = 2,
+			visibility      = '[petbattle] hide; [novehicleui,pet,nooverridebar,nopossessbar] show; hide',
+		},
+		stanceBar = {
+			enabled = true,
+			style = 'darkenInactive',
+			mouseover = false,
+			clickThrough = false,
+			buttonsPerRow = STANCE_SLOTS,
+			buttons = STANCE_SLOTS,
+			point = 'TOPLEFT',
+			backdrop = false,
+			heightMult = 1,
+			widthMult = 1,
+			keepSizeRatio = true,
+			buttonSize = 32,
+			buttonHeight = 32,
+			buttonSpacing = 2,
+			backdropSpacing = 2,
+			inheritGlobalFade = false,
+			visibility = '[vehicleui][petbattle] hide; show'
+		},
+		totemBar = {
+			enable = true,
+			spacing = 4,
+			keepSizeRatio = true,
+			buttonSize = 32,
+			buttonHeight = 32,
+			flyoutDirection = 'UP',
+			flyoutSize = 28,
+			flyoutHeight = 28,
+			flyoutSpacing = 2,
+			font = 'PT Sans Narrow',
+			fontOutline = 'OUTLINE',
+			fontSize = 12,
+			mouseover = false,
+			visibility = '[vehicleui] hide;show',
+		},
+		microbar = {
+			enabled = true,
+			mouseover = false,
+			useIcons = false,
+			backdrop = true,
+			buttonsPerRow = 12,
+			buttonSize = 20,
+			buttonHeight = 24,
+			buttonSpacing = 2,
+			keepSizeRatio = false,
+			backdropSpacing = 2,
+			heightMult = 1,
+			widthMult = 1,
+			visibility = '[petbattle] hide; show',
+		}
+	})
 
-    -- Sort Spinner
-    spinner = {
-      enable = true,
-    },
-  })
+	for i = 1, 15 do
+		if i ~= 11 and i ~= 12 then
+			local barN = 'bar' .. i
+			pf.actionbar[barN].visibility = '[vehicleui][petbattle][overridebar] hide; show'
+		end
+	end
 
-  -- ! IMPORTANT ! --
-  pf.dbConverted = E.version
-  pf.actionbar.convertPages = false -- just don't !
-  pf.convertPages = true -- don't you dare fuck the action bars up again
-  pf.general.taintLog = true
-  -- ! --
-  
-  -- Use Debug output in development mode
-  
+	crushFnc(pf.nameplates, {
+		cutaway = {
+			health = { enable = true, },
+			power = { enable = true, },
+		},
+		threat = {
+			indicator = true,
+			enable = true,
+		},
+	})
 
-  -- Merge Tables
-  crushFnc(E.db, pf)
+	-- ! IMPORTANT ! --
+	pf.gridSize = 76
+	pf.convertPages = true -- don't you dare fuck the action bars up again
 
-  -- Set Globals
-  crushFnc(E.global, {
-    uiScaleInformed = true,
+	-- Merge Tables
+	crushFnc(E.db, pf)
 
-    general = {
-      commandBarSetting = "DISABLED",
-      UIScale = F.PixelPerfect(),
-    },
-  })
+	-- Set Globals
+	-- crushFnc(E.global, {
+	--   uiScaleInformed = true,
+
+	--   general = {
+	--     commandBarSetting = "DISABLED",
+	--   },
+	-- })
 end
 
 local SetupProfilePrivate = function()
-  local isBagsEnabled = true
+	local isBagsEnabled = true
 
-  local BAG_ADDONS = { "Bagnon", "BetterBags", "Baggins", "Sorted", "Inventorian", "Baganator", "ArkInventory", "OneBag3", "Combuctor" }
+	local BAG_ADDONS = { "Bagnon", "BetterBags", "Baggins", "Sorted", "Inventorian", "Baganator", "ArkInventory", "OneBag3",
+		"Combuctor" }
 
-  for _, addon in ipairs(BAG_ADDONS) do
-    if F.IsAddOnEnabled(addon) then isBagsEnabled = false end
-  end
+	for _, addon in ipairs(BAG_ADDONS) do
+		if F.IsAddOnEnabled(addon) then isBagsEnabled = false end
+	end
 
-  F.Table.Crush(E.private, {
-    
-    install_complete = ElvUIVersion,
+	F.Table.Crush(E.private, {
 
-    general = {
-      raidUtility = false,
-      totemTracker = false,
-      lootRoll = false,
-      queueStatus = true,
-      worldMap = true,
-      minimap = {
-        enable = false
-      },
-    },
+		general = {
+			raidUtility = false,
+			totemTracker = false,
+			lootRoll = true,
+			queueStatus = true,
+			worldMap = false,
+			minimap = {
+				enable = false
+			},
+		},
 
-    unitframe = {
-      enable = false,
-      disabledBlizzardFrames = {
-        castbar = false,
-        player = false,
-        target = false,
-        focus = false,
-        boss = false,
-        arena = false,
-        party = false,
-        raid = false,
-      }
-    },
+		unitframe = {
+			enable = false,
+			disabledBlizzardFrames = {
+				castbar = false,
+				player = false,
+				target = false,
+				focus = false,
+				boss = false,
+				arena = false,
+				party = false,
+				raid = false,
+			}
+		},
 
-    actionbar = {
-      enable = false,
-      hideCooldownBling = false,
-    },
+		actionbar = {
+			enable = true,
+			hideCooldownBling = false,
+			masque = {
+				actionbars = true,
+				petBar = true,
+				stanceBar = true,
+			},
+		},
 
-    nameplates = {
-      enable = false,
-    },
+		nameplates = {
+			enable = false,
+		},
 
-    tooltip = {
-      enable = false,
-    },
+		tooltip = {
+			enable = false,
+		},
 
-    chat = {
-      enable = true,
-    },
+		chat = {
+			enable = true,
+		},
 
-    bags = {
-      enable = isBagsEnabled,
-      bagBar = true
-    },
+		bags = {
+			enable = isBagsEnabled,
+			bagBar = true
+		},
 
-    auras = {
-      enable = false,
-      disableBlizzard = false,
-      buffsHeader = false,
-      debuffsHeader = false
-    },
+		auras = {
+			enable = false,
+			disableBlizzard = false,
+			buffsHeader = false,
+			debuffsHeader = false
+		},
 
-    -- Skins
-    skins = {
-      ace3Enable = true,
-	    libDropdown = true,
-	    checkBoxSkin = true,
-      parchmentRemoverEnable = false,
-      blizzard = {
-        enable = true,
-        eventLog = true,
-        misc = false,
-        blizzardOptions = false,
-        petbattleui = false,
-        binding = false,
-        loot = false,
-        covenantPreview = false,
-        inspect = false,
-        debug = true,
-        lfg = false,
-        tooltip = false,
-        bmah = false,
-        worldmap = true,
-        questTimers = false,
-        tutorials = false,
-        addonManager = false,
-        trade = false,
-        genericTrait = false,
-        timemanager = false,
-        engraving = false,
-        gossip = false,
-        deathRecap = false,
-        bags = false,
-        guildcontrol = false,
-        covenantRenown = false,
-        guild = false,
-        artifact = false,
-        tradeskill = false,
-        garrison = false,
-        playerChoice = false,
-        transmogrify = false,
-        gbank = false,
-        expansionLanding = false,
-        craft = false,
-        achievement = false,
-        contribution = false,
-        archaeology = false,
-        adventureMap = false,
-        mail = false,
-        bgscore = false,
-        stable = false,
-        questChoice = false,
-        guildBank = false,
-        collections = false,
-        orderhall = false,
-        tabard = false,
-        islandQueue = false,
-        itemUpgrade = false,
-        weeklyRewards = false,
-        friends = false,
-        islandsPartyPose = false,
-        talkinghead = false,
-        nonraid = false,
-        azerite = false,
-        guide = false,
-        lfguild = false,
-        gmChat = false,
-        azeriteRespec = false,
-        merchant = false,
-        raid = false,
-        chromieTime = false,
-        losscontrol = false,
-        taxi = false,
-        reforge = false,
-        objectiveTracker = false,
-        spellbook = false,
-        runeforge = false,
-        arenaRegistrar = false,
-        barber = false,
-        majorFactions = false,
-        covenantSanctum = false,
-        guildregistrar = false,
-        communities = false,
-        azeriteEssence = false,
-        mirrorTimers = false,
-        battlefield = false,
-        animaDiversion = false,
-        channels = false,
-        pvp = false,
-        alliedRaces = false,
-        help = false,
-        auctionhouse = false,
-        petition = false,
-        greeting = false,
-        obliterum = false,
-        dressingroom = false,
-        scrapping = false,
-        quest = false,
-        socket = false,
-        macro = false,
-        soulbinds = false,
-        character = false,
-        subscriptionInterstitial = false,
-        itemInteraction = false,
-        encounterjournal = false,
-        alertframes = false,
-        editor = false,
-        perks = false,
-        arena = false,
-        torghastLevelPicker = false,
-        trainer = false,
-        talent = false,
-        bgmap = false,
-        voidstorage = false,
-        calendar = false,
-      }
-    },
-  })
+		skins = {
+			ace3Enable = true,
+			libDropdown = true,
+			checkBoxSkin = true,
+			parchmentRemoverEnable = false,
+			blizzard = {
+				enable = true,
+				eventLog = true,
+				worldmap = false,
+				achievement = false,
+				addonManager = false,
+				alertframes = false,
+				alliedRaces = false,
+				animaDiversion = false,
+				arena = false,
+				arenaRegistrar = false,
+				archaeology = false,
+				artifact = false,
+				azerite = false,
+				azeriteEssence = false,
+				azeriteRespec = false,
+				bags = false,
+				barber = false,
+				battlefield = false,
+				bgmap = false,
+				bgscore = false,
+				binding = false,
+				blizzardOptions = false,
+				bmah = false,
+				calendar = false,
+				channels = false,
+				character = false,
+				chromieTime = false,
+				collections = false,
+				communities = false,
+				contribution = false,
+				craft = false,
+				covenantPreview = false,
+				covenantRenown = false,
+				covenantSanctum = false,
+				deathRecap = false,
+				dressingroom = false,
+				editor = false,
+				encounterjournal = false,
+				engraving = false,
+				expansionLanding = false,
+				friends = false,
+				garrison = false,
+				genericTrait = false,
+				gmChat = false,
+				gossip = false,
+				greeting = false,
+				guild = false,
+				guildBank = false,
+				guildcontrol = false,
+				guildregistrar = false,
+				guide = false,
+				islandQueue = false,
+				islandsPartyPose = false,
+				inspector = false,
+				itemInteraction = false,
+				itemUpgrade = false,
+				lfg = false,
+				lfguild = false,
+				loot = false,
+				losscontrol = false,
+				macro = false,
+				mail = false,
+				majorFactions = false,
+				merchant = false,
+				mirrorTimers = false,
+				misc = false,
+				nonraid = false,
+				objectiveTracker = false,
+				obliterum = false,
+				orderhall = false,
+				perks = false,
+				petition = false,
+				petbattleui = false,
+				playerChoice = false,
+				pvp = false,
+				quest = false,
+				questChoice = false,
+				questTimers = false,
+				raid = false,
+				reforge = false,
+				runeforge = false,
+				scrapping = false,
+				socket = false,
+				soulbinds = false,
+				spellbook = false,
+				stable = false,
+				subscriptionInterstitial = false,
+				tabard = false,
+				talkinghead = false,
+				talent = false,
+				taxi = false,
+				timemanager = false,
+				torghastLevelPicker = false,
+				tooltip = false,
+				trade = false,
+				trainer = false,
+				transmogrify = false,
+				tradeskill = false,
+				voidstorage = false,
+				weeklyRewards = false,
+			}
+		},
+
+		theme = "classic"
+	})
 end
 
 local SetuProfileGlobal = function()
-  F.Table.Crush(E.global, {
-    -- General
-    general = {
-      ultrawide = false,
-      UIScale = 0.6,
-      WorldMapCoordinates = {
-        position = "BOTTOMRIGHT",
-      },
+	F.Table.Crush(E.global, {
+		-- General
+		general = {
+			-- ultrawide = false,
+			-- UIScale = 0.6,
+			-- WorldMapCoordinates = {
+			--   position = "BOTTOMRIGHT",
+			-- },
 
-      AceGUI = {
-        width = 1440,
-        height = 810,
-      },
-    },
-  })
+			AceGUI = {
+				width = 1070,
+				height = 833,
+			},
+		},
+	})
 end
 
 local function SetupChat()
@@ -442,30 +624,17 @@ local function SetupChat()
 		FCF_SetChatWindowFontSize(nil, frame, 14)
 
 		-- move ElvUI default loot frame to the left chat, so that Recount/Skada can go to the right chat.
-		if id == 4 and (chatName == (LOOT..' / '..TRADE) or chatName == (loot..' / '..trade)) then
+		if id == 4 and (chatName == (LOOT .. ' / ' .. TRADE) or chatName == (loot .. ' / ' .. trade)) then
 			FCF_UnDockFrame(frame)
-			frame:ClearAllPoints()
-			frame:Point('BOTTOMLEFT', LeftChatToggleButton, 'TOPLEFT', 1, 3)
-			FCF_SetWindowName(frame, 'Loot')
 			FCF_DockFrame(frame)
-			FCF_SetLocked(frame, 1)
-			frame:Show()
-		end
-		if frame:GetLeft() then
-			FCF_SavePositionAndDimensions(frame)
-			FCF_StopDragging(frame)
 		end
 	end
 end
 
 function PF:LoadElvUIProfile()
-  F.Chat('chat', 'Load ElvUI Profile');
-
-  E:SetupCVars(true)
-  E:SetupChat(true)
-  SetupProfile()
-  SetupProfilePrivate()
-  SetuProfileGlobal()
-  SetupChat()
-  E:UpdateDB()
+	F.Chat('chat', 'Load ElvUI Profile');
+	SetupProfile()
+	SetupProfilePrivate()
+	SetuProfileGlobal()
+	SetupChat()
 end

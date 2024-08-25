@@ -70,51 +70,10 @@ function F.Enum(tbl)
 	return tbl
 end
 
-function F.Round(n, q)
-	q = q or 1
-
-	local int, frac = modf(n / q)
-	if n == abs(n) and frac >= 0.5 then
-		return (int + 1) * q
-	elseif frac <= -0.5 then
-		return (int - 1) * q
-	end
-
-	return int * q
-end
-
 function F.AlmostEqual(a, b)
 	if not a or not b then return false end
 
 	return abs(a - b) <= 0.001
-end
-
-function F.PerfectScale(n)
-	local m = E.mult
-	return (m == 1 or n == 0) and n or (n * m)
-end
-
-function F.PixelPerfect()
-	-- local perfectScale = 768 / E.physicalHeight
-	-- if E.physicalHeight > 1440 then perfectScale = 0.65 end
-
-	-- return perfectScale
-	local perfectScale = 0.6
-    return perfectScale
-end
-
-local baseScale = 768 / 1440 -- 0,5333333333333333
-local baseMulti = 0.64 / baseScale -- 1.2
-local perfectScale = baseScale / F.PixelPerfect()
-local perfectMulti = baseMulti * perfectScale
-
-
-function F.Dpi(value, frac)
-	return F.Round(value * perfectMulti, frac)
-end
-
-function F.DpiRaw(value)
-	return value * perfectMulti
 end
 
 function F.Position(anchor1, parent, anchor2, x, y)
@@ -231,108 +190,6 @@ function F.FastColorGradient(perc, r1, g1, b1, r2, g2, b2)
 	end
 
 	return (r2 * perc) + (r1 * (1 - perc)), (g2 * perc) + (g1 * (1 - perc)), (b2 * perc) + (b1 * (1 - perc))
-end
-
-function F.RemoveFontTemplate(fs)
-	E.texts[fs] = nil
-end
-
-function F.GetFontColorFromDB(db, prefix)
-	-- Vars
-	if prefix == nil then prefix = "" end
-	local fontColor
-	local useDB = (db and prefix) and true or false
-	local colorSwitch = (useDB and db[prefix .. "FontColor"]) or I.General.DefaultFontColor
-
-	-- Switch
-	if colorSwitch == "CUSTOM" then
-		fontColor = (useDB and db[prefix .. "FontCustomColor"]) or I.General.DefaultFontCustomColor
-	elseif colorSwitch == "TYMEUI" then
-		fontColor = I.Strings.Branding.ColorRGBA
-	elseif colorSwitch == "CLASS" then
-		local classColor = E:ClassColor(E.myclass, true)
-		fontColor = {
-		r = classColor.r,
-		g = classColor.g,
-		b = classColor.b,
-		a = 1,
-		}
-	elseif colorSwitch == "VALUE" then
-		fontColor = {
-		r = E.media.rgbvaluecolor[1],
-		g = E.media.rgbvaluecolor[2],
-		b = E.media.rgbvaluecolor[3],
-		a = 1,
-		}
-	elseif colorSwitch == "COVENANT" then
-		local covenantColor = COVENANT_COLORS[F.GetCachedCovenant()] or I.Strings.Branding.ColorRGBA
-		fontColor = {
-		r = covenantColor.r,
-		g = covenantColor.g,
-		b = covenantColor.b,
-		a = 1,
-		}
-	else
-		fontColor = {
-		r = 1,
-		g = 1,
-		b = 1,
-		a = 1,
-		}
-	end
-
-	return fontColor
-end
-
-function F.SetFontColorFromDB(db, prefix, fs)
-	local fontColor = F.GetFontColorFromDB(db, prefix)
-	F.RemoveFontTemplate(fs)
-	fs:SetTextColor(fontColor.r, fontColor.g, fontColor.b, fontColor.a)
-end
-
-function F.SetFontScaledFromDB(db, prefix, fs, color, fontOverwrite)
-	F.SetFontFromDB(db, prefix, fs, color, fontOverwrite, true)
-end
-
-function F.GetFontPath(font)
-	font = font or I.General.DefaultFont
-
-	local lsmFont = LSM:Fetch("font", F.FontOverride(font))
-	if not lsmFont then lsmFont = LSM:Fetch("font", font) end -- backup to non-override font
-	if not lsmFont then lsmFont = LSM:Fetch("font", I.General.DefaultFont) end -- backup to normal font if not found
-	if not lsmFont then lsmFont = E.media.normFont end -- backup to elvui font if not found
-
-	return lsmFont
-end
-
-function F.SetFontFromDB(db, prefix, fs, color, fontOverwrite, useScaling)
-	local useDB = (db and prefix) and true or false
-	local font = (useDB and db[prefix .. "Font"]) or I.General.DefaultFont
-	local size = (useDB and db[prefix .. "FontSize"]) or I.General.DefaultFontSize
-	local outline = (useDB and db[prefix .. "FontOutline"]) or I.General.DefaultFontOutline
-	local shadow = (useDB and db[prefix .. "FontShadow"] ~= nil) and db[prefix .. "FontShadow"]
-	if shadow == nil then shadow = I.General.DefaultFontShadow end
-
-	if fontOverwrite then font = fontOverwrite end
-	local lsmFont = F.GetFontPath(font)
-
-	shadow = F.GetFontShadowOverride(font, shadow)
-	outline = F.FontStyleOverride(font, outline)
-
-	if outline == "NONE" then outline = "" end
-
-	F.RemoveFontTemplate(fs)
-	fs:SetFont(lsmFont, useScaling and F.FontSizeScaled(size) or size, (not shadow and outline) or "")
-
-	if shadow then
-		fs:SetShadowOffset(1, -0.5)
-		fs:SetShadowColor(0, 0, 0, 1)
-	else
-		fs:SetShadowOffset(0, 0)
-		fs:SetShadowColor(0, 0, 0, 0)
-	end
-
-	if (color == nil) or (color == true) then F.SetFontColorFromDB(db, prefix, fs) end
 end
 
 do

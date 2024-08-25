@@ -32,6 +32,7 @@ TYMEUI.Version = GetAddOnMetadata(AddonName, "Version")
 local defaults = {
   profile = {
       profileModule = {
+          ElvUIProfileHasBeenSet = false,
           ProfileHasBeenSet = false
       }
   }
@@ -88,9 +89,6 @@ function TYMEUI:Initialize()
       end)
       return
     end
-
-    -- Force ElvUI Setup to hide
-    E.private.install_complete = E.version
   
     -- Lets go!
     self:InitializeModules()
