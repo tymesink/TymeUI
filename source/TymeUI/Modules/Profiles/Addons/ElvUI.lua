@@ -6,44 +6,41 @@ module.Enabled = true;
 module.Initialized = false;
 
 local _G = _G
+local next, ipairs = next, ipairs
 local FCF_DockFrame, FCF_UnDockFrame = FCF_DockFrame, FCF_UnDockFrame
 local FCF_GetChatWindowInfo = FCF_GetChatWindowInfo
 local FCF_SetChatWindowFontSize = FCF_SetChatWindowFontSize
 local loot = LOOT:match "^.?[\128-\191]*"
 local trade = TRADE:match "^.?[\128-\191]*"
-local ACTION_SLOTS = _G.NUM_PET_ACTION_SLOTS or 10
-local STANCE_SLOTS = _G.NUM_STANCE_SLOTS or 10
+local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
+
+-- Local Tables
+local pf = {
+	actionbar = {},
+	auras = {
+		buffs = {},
+		debuffs = {},
+	},
+	bags = {},
+	chat = {},
+	cooldown = {},
+	databars = {},
+	datatexts = {
+		panels = {},
+	},
+	general = {},
+	nameplates = {},
+	movers = {},
+	tooltip = {},
+	unitframe = {
+		colors = {},
+		units = {},
+	},
+}
 
 local SetupProfile = function()
-	local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
-
-	-- Setup Local Tables
-	local pf = {
-		actionbar = {},
-		auras = {
-			buffs = {},
-			debuffs = {},
-		},
-		bags = {},
-		chat = {},
-		cooldown = {},
-		databars = {},
-		datatexts = {
-			panels = {},
-		},
-		general = {},
-		nameplates = {},
-		movers = {},
-		tooltip = {},
-		unitframe = {
-			colors = {},
-			units = {},
-		},
-	}
-
 	-- Setup Unit Tables & Disable Info Panel
-	for _, unit in
-	next,
+	for _, unit in next,
 	{
 		"player",
 		"target",
@@ -72,34 +69,29 @@ local SetupProfile = function()
 	end
 
 	crushFnc(pf.databars, {
-		statusbar = 'Rain',
-		customTexture = true,
-		experience = {
-			enable = true,
-			width = 515,
-			height = 12,
-			showBubbles = true
+		["threat"] = {
+			["width"] = 140,
+			["height"] = 15,
 		},
-		reputation = {
-			enable = true,
-			width = 222,
-			height = 10,
-			showBubbles = true
+		["honor"] = {
+			["width"] = 320,
+			["height"] = 15,
+			["showBubbles"] = true,
 		},
-		threat = {
-			enable = true,
-			width = 140
+		["reputation"] = {
+			["enable"] = true,
+			["textFormat"] = "CUR",
+			["width"] = 320,
+			["height"] = 15,
+			["showBubbles"] = true,
 		},
-		honor = {
-			enable = true,
-			showBubbles = true
+		["statusbar"] = "Rain",
+		["experience"] = {
+			["width"] = 515,
+			["height"] = 15,
+			["showBubbles"] = true,
 		},
-		azerite = {
-			enable = false
-		},
-		petExperience = {
-			enable = false
-		}
+		["customTexture"] = true
 	})
 
 	crushFnc(pf.datatexts, {
@@ -119,40 +111,34 @@ local SetupProfile = function()
 	})
 
 	crushFnc(pf.movers, {
-		-- F.Position(1, 2, 3)
-		-- 1 => Anchor position of SELECTED FRAME
-		-- 2 => Anchor Parent
-		-- 3 => Anchor position of PARENT FRAME
-
-		AddonCompartmentMover = F.Position('TOPRIGHT', 'ElvUIParent', 'TOPRIGHT', -215, -28),
-		AltPowerBarMover = F.Position('TOP', 'ElvUIParent', 'TOP', 0, -53),
-		BelowMinimapContainerMover = F.Position('TOPRIGHT', 'ElvUIParent', 'TOPRIGHT', -1, -262),
-		BNETMover = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 0, 208),
-		BossButton = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 214, 237),
-		ElvAB_1 = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 191),
-		ElvAB_2 = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 149),
-		ElvAB_3 = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', -148, 60),
-		ElvAB_4 = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 148, 60),
-		ElvAB_6 = F.Position('BOTTOMRIGHT', 'ElvUIParent', 'BOTTOMRIGHT', 0, 295),
-		ElvUIBagMover = F.Position('BOTTOMRIGHT', 'ElvUIParent', 'BOTTOMRIGHT', -274, 257),
-		ExperienceBarMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 135),
-		GMMover = F.Position('TOPLEFT', 'ElvUIParent', 'TOPLEFT', 251, -21),
-		HonorBarMover = F.Position('BOTTOMRIGHT', 'ElvUIParent', 'BOTTOMRIGHT', -477, 7),
-		LeftChatMover = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 0, 3),
-		MicrobarMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 0),
-		PetAB = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 235),
-		PowerBarContainerMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 306),
-		PrivateAurasMover = F.Position('TOPRIGHT', 'ElvUIParent', 'TOPRIGHT', -217, -211),
-		QueueStatusMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', 0, 95),
-		ReputationBarMover = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 477, 7),
-		RightChatMover = F.Position('BOTTOMRIGHT', 'ElvUIParent', 'BOTTOMRIGHT', 0, 3),
-		ShiftAB = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 146, 353),
-		ThreatBarMover = F.Position('BOTTOM', 'ElvUIParent', 'BOTTOM', -625, 261),
-		TooltipMover = F.Position('TOPLEFT', 'ElvUIParent', 'TOPLEFT', 510, -34),
-		TotemTrackerMover = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 417, 27),
-		VehicleLeaveButton = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 552, 230),
-		ZoneAbility = F.Position('BOTTOMLEFT', 'ElvUIParent', 'BOTTOMLEFT', 594, 108)
-
+		["QueueStatusMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,95",
+		["PetAB"] = "BOTTOM,ElvUIParent,BOTTOM,0,235",
+		["ElvAB_1"] = "BOTTOM,ElvUIParent,BOTTOM,0,191",
+		["LeftChatMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,0,3",
+		["BelowMinimapContainerMover"] = "TOPRIGHT,ElvUIParent,TOPRIGHT,-1,-262",
+		["ElvAB_4"] = "BOTTOM,ElvUIParent,BOTTOM,148,60",
+		["VehicleLeaveButton"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,552,230",
+		["AltPowerBarMover"] = "TOP,ElvUIParent,TOP,0,-53",
+		["BossButton"] = "BOTTOM,ElvUIParent,BOTTOM,214,237",
+		["ReputationBarMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,477,8",
+		["ZoneAbility"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,594,108",
+		["ElvAB_2"] = "BOTTOM,ElvUIParent,BOTTOM,0,149",
+		["AddonCompartmentMover"] = "TOPRIGHT,ElvUIParent,TOPRIGHT,-215,-28",
+		["TotemTrackerMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,417,27",
+		["BNETMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,0,208",
+		["ShiftAB"] = "BOTTOMLEFT,UIParent,BOTTOMLEFT,634,211",
+		["ThreatBarMover"] = "BOTTOMRIGHT,UIParent,BOTTOMRIGHT,-622,260",
+		["HonorBarMover"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,-476,8",
+		["ElvAB_6"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,0,295",
+		["TooltipMover"] = "TOPLEFT,ElvUIParent,TOPLEFT,510,-34",
+		["PowerBarContainerMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,322",
+		["PrivateAurasMover"] = "TOPRIGHT,ElvUIParent,TOPRIGHT,-217,-211",
+		["ElvUIBagMover"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,-274,257",
+		["MicrobarMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,27",
+		["RightChatMover"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,0,3",
+		["ExperienceBarMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,8",
+		["GMMover"] = "TOPLEFT,ElvUIParent,TOPLEFT,251,-21",
+		["ElvAB_3"] = "BOTTOM,ElvUIParent,BOTTOM,-148,60"
 	})
 
 	crushFnc(pf.general, {
@@ -160,7 +146,7 @@ local SetupProfile = function()
 		afk = false,
 		afkChat = false,
 		afkSpin = false,
-		taintLog = false,
+		taintLog = true,
 		interruptAnnounce = 'NONE',
 		autoRepair = 'NONE',
 		autoTrackReputation = true,
@@ -258,155 +244,47 @@ local SetupProfile = function()
 	})
 
 	crushFnc(pf.actionbar, {
-		chargeCooldown = true,
-		useDrawSwipeOnCharges = true,
-		flashAnimation = true,
-		transparent = true,
-		convertPages = false, -- just don't !
-		bar1 = {
-			enabled = true,
-			backdrop = false,
-			buttonSize = 42,
-			buttons = 12,
-			buttonsPerRow = 12,
+		["chargeCooldown"] = true,
+		["useDrawSwipeOnCharges"] = true,
+		["flashAnimation"] = true,
+		["transparent"] = true,
+		["bar1"] = {
+			["buttonSize"] = 42,
 		},
-		bar2 = {
-			enabled = true,
-			backdrop = false,
-			buttonSize = 42,
-			buttons = 12,
-			buttonsPerRow = 12,
+		["bar2"] = {
+			["enabled"] = true,
+			["buttonSize"] = 42,
 		},
-		bar3 = {
-			enabled = true,
-			backdrop = false,
-			buttonsPerRow = 6,
-			buttonSize = 36,
-			buttons = 12
+		["bar3"] = {
+			["buttonSize"] = 36,
+			["buttons"] = 12,
 		},
-		bar4 = {
-			enabled = true,
-			backdrop = false,
-			buttonsPerRow = 6,
-			buttonSize = 36,
-			buttons = 12
+		["bar5"] = {
+			["enabled"] = false,
 		},
-		bar5 = {
-			enabled = false,
+		["bar4"] = {
+			["backdrop"] = false,
+			["buttonsPerRow"] = 6,
+			["buttonSize"] = 36,
 		},
-		bar6 = {
-			enabled = true,
-			backdrop = false,
-			buttonSpacing = 2,
-			buttonsPerRow = 1,
-			buttonSize = 40,
-			buttons = 12
+		["bar6"] = {
+			["enabled"] = true,
+			["buttonsPerRow"] = 1,
+			["buttonSize"] = 40,
 		},
-		bar7 = {
-			enabled = false,
-			buttonSize = 36,
+		["barPet"] = {
+			["backdrop"] = false,
+			["buttonsPerRow"] = 10,
 		},
-		bar8 = {
-			enabled = false,
-			buttonSize = 36
-		},
-		bar9 = {
-			enabled = false,
-			buttonSize = 36
-		},
-		bar10 = {
-			enabled = false,
-			buttonSize = 36
-		},
-		bar11 = {
-			enabled = false,
-			buttonSize = 36
-		},
-		bar12 = {
-			enabled = false,
-			buttonSize = 36
-		},
-		bar13 = {
-			enabled = false,
-			buttonSize = 36
-		},
-		bar14 = {
-			enabled = false,
-			buttonSize = 36
-		},
-		bar15 = {
-			enabled = false,
-			buttonSize = 36
-		},
-		barPet = {
-			enabled         = true,
-			backdrop        = false,
-			buttonsPerRow   = ACTION_SLOTS,
-			buttons         = ACTION_SLOTS,
-			buttonSize      = 32,
-			buttonHeight    = 32,
-			buttonSpacing   = 2,
-			backdropSpacing = 2,
-			visibility      = '[petbattle] hide; [novehicleui,pet,nooverridebar,nopossessbar] show; hide',
-		},
-		stanceBar = {
-			enabled = true,
-			style = 'darkenInactive',
-			mouseover = false,
-			clickThrough = false,
-			buttonsPerRow = STANCE_SLOTS,
-			buttons = STANCE_SLOTS,
-			point = 'TOPLEFT',
-			backdrop = false,
-			heightMult = 1,
-			widthMult = 1,
-			keepSizeRatio = true,
-			buttonSize = 32,
-			buttonHeight = 32,
-			buttonSpacing = 2,
-			backdropSpacing = 2,
-			inheritGlobalFade = false,
-			visibility = '[vehicleui][petbattle] hide; show'
-		},
-		totemBar = {
-			enable = true,
-			spacing = 4,
-			keepSizeRatio = true,
-			buttonSize = 32,
-			buttonHeight = 32,
-			flyoutDirection = 'UP',
-			flyoutSize = 28,
-			flyoutHeight = 28,
-			flyoutSpacing = 2,
-			font = 'PT Sans Narrow',
-			fontOutline = 'OUTLINE',
-			fontSize = 12,
-			mouseover = false,
-			visibility = '[vehicleui] hide;show',
-		},
-		microbar = {
-			enabled = true,
-			mouseover = false,
-			useIcons = false,
-			backdrop = true,
-			buttonsPerRow = 12,
-			buttonSize = 20,
-			buttonHeight = 24,
-			buttonSpacing = 2,
-			keepSizeRatio = false,
-			backdropSpacing = 2,
-			heightMult = 1,
-			widthMult = 1,
-			visibility = '[petbattle] hide; show',
+		["microbar"] = {
+			["enabled"] = true,
+			["useIcons"] = false,
+			["mouseover"] = true,
+			["buttonSize"] = 24,
+			["buttons"] = 11,
+			["backdrop"] = true,
 		}
 	})
-
-	for i = 1, 15 do
-		if i ~= 11 and i ~= 12 then
-			local barN = 'bar' .. i
-			pf.actionbar[barN].visibility = '[vehicleui][petbattle][overridebar] hide; show'
-		end
-	end
 
 	crushFnc(pf.nameplates, {
 		cutaway = {
@@ -421,7 +299,6 @@ local SetupProfile = function()
 
 	-- ! IMPORTANT ! --
 	pf.gridSize = 76
-	pf.convertPages = true -- don't you dare fuck the action bars up again
 
 	-- Merge Tables
 	crushFnc(E.db, pf)
@@ -438,9 +315,7 @@ end
 
 local SetupProfilePrivate = function()
 	local isBagsEnabled = true
-
-	local BAG_ADDONS = { "Bagnon", "BetterBags", "Baggins", "Sorted", "Inventorian", "Baganator", "ArkInventory", "OneBag3",
-		"Combuctor" }
+	local BAG_ADDONS = { "Bagnon", "BetterBags", "Baggins", "Sorted", "Inventorian", "Baganator", "ArkInventory", "OneBag3", "Combuctor" }
 
 	for _, addon in ipairs(BAG_ADDONS) do
 		if F.IsAddOnEnabled(addon) then isBagsEnabled = false end
@@ -451,7 +326,7 @@ local SetupProfilePrivate = function()
 		general = {
 			raidUtility = false,
 			totemTracker = false,
-			lootRoll = true,
+			lootRoll = false,
 			queueStatus = true,
 			worldMap = false,
 			minimap = {
@@ -484,7 +359,7 @@ local SetupProfilePrivate = function()
 		},
 
 		nameplates = {
-			enable = false,
+			enable = true,
 		},
 
 		tooltip = {

@@ -52,6 +52,12 @@ local default = {
             ["isNew"] = false,
             ["barName"] = "ChocolateBar1",
         },
+        ["Hekili"] = {
+            ["index"] = 13,
+            ["align"] = "right",
+            ["isNew"] = false,
+            ["barName"] = "ChocolateBar1",
+        },
         ["Details"] = {
             ["index"] = 12,
             ["align"] = "right",
@@ -72,8 +78,8 @@ local default = {
             ["showText"] = false,
             ["barName"] = "ChocolateBar1",
         },
-        ["SimpleAddonManager"] = {
-            ["index"] = 6,
+        ["TinyPad"] = {
+            ["index"] = 2,
             ["align"] = "right",
             ["isNew"] = false,
             ["showText"] = false,
@@ -83,6 +89,13 @@ local default = {
             ["index"] = 1,
             ["align"] = "center",
             ["isNew"] = false,
+            ["barName"] = "ChocolateBar1",
+        },
+        ["Rematch"] = {
+            ["index"] = 3,
+            ["align"] = "right",
+            ["isNew"] = false,
+            ["showText"] = false,
             ["barName"] = "ChocolateBar1",
         },
         ["DBM"] = {
@@ -97,13 +110,6 @@ local default = {
             ["isNew"] = false,
             ["barName"] = "ChocolateBar1",
         },
-        ["TinyPad"] = {
-            ["index"] = 2,
-            ["align"] = "right",
-            ["isNew"] = false,
-            ["showText"] = false,
-            ["barName"] = "ChocolateBar1",
-        },
         ["Krowi_AchievementFilterLDB"] = {
             ["index"] = 4,
             ["align"] = "right",
@@ -111,8 +117,8 @@ local default = {
             ["showText"] = false,
             ["barName"] = "ChocolateBar1",
         },
-        ["Rematch"] = {
-            ["index"] = 3,
+        ["SimpleAddonManager"] = {
+            ["index"] = 6,
             ["align"] = "right",
             ["isNew"] = false,
             ["showText"] = false,
@@ -130,7 +136,7 @@ local default = {
             ["isNew"] = false,
             ["barName"] = "ChocolateBar1",
         },
-    }
+    },
 }
 
 function module:LoadProfile()
