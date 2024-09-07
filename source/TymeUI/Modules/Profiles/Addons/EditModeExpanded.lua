@@ -20,9 +20,7 @@ local getCurrentLayoutName = function ()
 end
 
 local setCustomLayoutProfile = function(profileName)
-    local profile = {}
-
-    F.Table.Crush(profile, {
+    local profile = {
         ["PetActionBar"] = {
             ["profiles"] = {
                 [profileName] = {},
@@ -560,16 +558,15 @@ local setCustomLayoutProfile = function(profileName)
                 },
             },
         },
-    })
-
+    }
     return profile
 end
 
 
 function module:LoadProfile()
     local profileName = getCurrentLayoutName();
-    local default = setCustomLayoutProfile(profileName)
-    F.Table.Crush(profileDbDefault.global, default) 
+    local layoutProfile = setCustomLayoutProfile(profileName)
+    F.Table.Crush(profileDbDefault.global, layoutProfile) 
     return true
 end
 
@@ -586,7 +583,7 @@ function module:Initialize()
         local loaded = self:LoadProfile()
         if loaded == true then
             module.ReloadUI = true
-            TYMEUI:PrintMessage(module.Name..' => Profile Loaded')
+            TYMEUI:PrintMessage(module.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
             -- We are done, hooray!
 			self.Initialized = true
         end

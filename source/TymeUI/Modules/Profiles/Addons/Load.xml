@@ -8,4 +8,8 @@
   <Script file='DragonRider.lua' />
   <Script file='SimpleAddonManager.lua' />
   <Script file='Hekili.lua' />
+  <Script file='DBM-Core.lua' />
+  <Script file='SavedInstances.lua' />
+  <Script file='TomTom.lua' />
+  <Script file='WIM.lua' />
 </Ui>

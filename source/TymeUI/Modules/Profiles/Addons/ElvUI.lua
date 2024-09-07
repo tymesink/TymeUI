@@ -502,7 +502,7 @@ function module:Initialize()
         local loaded = self:LoadProfile()
         if loaded == true then
             module.ReloadUI = true
-            TYMEUI:PrintMessage(module.Name..' => Profile Loaded')
+            TYMEUI:PrintMessage(module.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
 			-- We are done, hooray!
 			self.Initialized = true
         end
