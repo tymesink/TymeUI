@@ -1,32 +1,33 @@
 local TYMEUI, F, I, E = unpack(TymeUI)
-local Profiles = TYMEUI:GetModule("Profiles")
+local PF = TYMEUI:GetModule("Profiles")
 local module = TYMEUI:NewModule("BagnonProfile", "AceHook-3.0")
-local profileAddonName = 'Bagnon'
+
+module.Enabled = true
+module.Initialized = false
+module.ReloadUI = false
+module.Name = 'Bagnon'
+
 local profileDb = Bagnon_Sets
 
-module.Enabled = true;
-module.Initialized = false;
-
 function module:LoadProfile()
-    profileDb.global.inventory.enabled = false
+	profileDb.global.inventory.enabled = false
+	return true
 end
 
 function module:Initialize()
-    -- Don't init second time
-    if not self.Enabled then
-        F.Chat('chat', self:GetName()..' is not enabled.');
-        return
-    end
+	-- Don't init second time
+	if self.Initialized then return end
 
-    if self.Initialized then return end
+	if PF:CanLoadProfileForAddon(module.Name, profileDb) then
+		local loaded = self:LoadProfile()
+		if loaded then
+			module.ReloadUI = true
+			TYMEUI:PrintMessage(module.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
 
-    if Profiles:IsAddOnLoaded(profileAddonName, profileDb) then
-        self:LoadProfile()
-    end
-    
-    -- We are done, hooray!
-    self.Initialized = true
-    F.Chat('chat', self:GetName()..':Initialized()');
+			-- We are done, hooray!
+			self.Initialized = true
+		end
+	end
 end
 
-Profiles:RegisterProfile(module)
+PF:RegisterProfile(module)

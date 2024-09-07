@@ -22,7 +22,7 @@ end
 function AH:Initialize()
     -- Don't init second time
     if self.Initialized then return end
-    F.Chat('chat','AuctionHouse:Initialize()');
+    TYMEUI:PrintMessage('AuctionHouse:Initialize()');
     self:RegisterEvent("CHAT_MSG_SYSTEM", SoldNotify);
 
     -- We are done, hooray!

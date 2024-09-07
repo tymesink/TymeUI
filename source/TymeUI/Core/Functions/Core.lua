@@ -26,54 +26,11 @@ local type = type
 local unpack = unpack
 local xpcall = xpcall
 
-F.baseColors = {
-	["red"] = {143, 10, 13},
-	["blue"] = {10, 12, 150},
-	["cyan"] = {16, 211, 255},
-	["teal"] = {0, 150, 89},
-	["green"] = {20, 150, 10},
-	["grassgreen"] = {50,150,50},
-	["darkgreen"] = {5,107,0},
-	["yellow"] = {255, 255, 0},
-	["white"] = {255, 255, 255},
-	["black"] = {0, 0, 0}
-}
-
-F.availColors = {
-	[1] = "red",
-	[2] = "blue",
-	[3] = "cyan",
-	[4] = "teal",
-	[5] = "green",
-	[6] = "grassgreen",
-	[7] = "yellow",
-	[8] = "white",
-	[9] = "black"
-}
-
-F.htmlColors = {
-	["orange"] = "|cFFFF8000",
-	["purple"] = "|cFFA335EE",
-	["brightblue"] = "|cFF0070DE",
-	["brightgreen"] = "|cFF1EFF00",
-	["white"] = "|cFFFFFFFF",
-	["close"] = "|r"
-}
-
-function F.Enum(tbl)
-	local length = #tbl
-	for i = 1, length do
-	  local v = tbl[i]
-	  tbl[v] = i
-	end
-  
-	return tbl
-end
-
-function F.AlmostEqual(a, b)
-	if not a or not b then return false end
-
-	return abs(a - b) <= 0.001
+function F.GetClassColor()
+	local className = select(2, UnitClass("player"))
+    local classColor = RAID_CLASS_COLORS[className] or C.white
+    local colorStr = classColor.colorStr
+    return colorStr
 end
 
 function F.Position(anchor1, parent, anchor2, x, y)
@@ -322,41 +279,33 @@ function F.GetCharName(lowercase)
 end
 
 function F.GetDBCharName(addSpace)
-	if(addSpace == true) then
+	if addSpace ~= nil and addSpace == true then
 		return UnitName("player").." - "..GetRealmName();
 	else
 		return UnitName("player").."-"..GetRealmName();
 	end
 end
 
-function F.Chat(msgType, msg, colors)
-	local from = "TymeUI";
-	local fromColor = "|cff0062ffTyme|r|cff0DEB11UI: |r";
+function F.Chat(msg, colors)
 	local valR, valG, valB;
 	
-	if (type(msg) ~= "string") then return nil; end
+	if (type(msg) ~= 'string') then return nil; end
 	if msg == nil then return nil; end
-
-	if (type(colors) == "table") then
+	if (colors == nil) then colors = I.Constants.ColorsRGB.yellow; end
+	
+	if (type(colors) == 'table') then
 		valR, valG, valB = F.Table.splitTable(colors);
-	elseif (F.Table.findTable(colors, F.baseColors)) then
-		valR,valG,valB = F.Table.splitTable(F.Table.getTable(colors, F.baseColors));
+	elseif (type(colors) == 'string' and F.Table.findTable(colors, I.Constants.ColorHex)) then
+		_, valR,valG,valB = F.String.HexToRGBA(colors);
+	elseif (F.Table.findTable(colors, I.Constants.ColorsRGB)) then
+		local colorTable = F.Table.getTable(colors, I.Constants.ColorsRGB);
+		valR,valG,valB = F.Table.splitTable(colorTable);
 	else
-		valR, valG, valB = F.Table.splitTable(F.baseColors.yellow);
+		valR, valG, valB = F.Table.splitTable(I.Constants.ColorsRGB.yellow);
 	end
 
-	if msgType == "error" then
-		UIErrorsFrame:AddMessage("<"..from.."> "..msg, valR, valG, valB, 1, 10)
-	end
-
-	if msgType == "chat" then
-		if DEFAULT_CHAT_FRAME then
-			DEFAULT_CHAT_FRAME:AddMessage(fromColor..msg, valR, valG, valB)
-		end
-	end
-
-	if msgType == "plainerror" then
-		UIErrorsFrame:AddMessage("<"..from.."> "..msg, valR, valG, valB, 1, 10)
+	if DEFAULT_CHAT_FRAME then
+		DEFAULT_CHAT_FRAME:AddMessage(msg, valR, valG, valB)
 	end
 end
  
@@ -384,6 +333,21 @@ function F.ToggleFrame(fname, action)
 			end
 		end
 	else
-		if (TYMEUI.DebugMode) then F.Chat("chat", "Frame error", "red") end
+		if (TYMEUI.DebugMode) then F.Chat("Frame error", "red") end
 	end
+end
+
+function F.Deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[F.Deepcopy(orig_key)] = F.Deepcopy(orig_value)
+        end
+        setmetatable(copy, F.Deepcopy(getmetatable(orig)))
+    else -- for numbers, strings, booleans, etc
+        copy = orig
+    end
+    return copy
 end

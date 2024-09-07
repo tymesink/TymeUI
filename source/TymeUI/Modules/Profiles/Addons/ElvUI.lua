@@ -1,9 +1,13 @@
 local TYMEUI, F, I, E = unpack(TymeUI)
-local Profiles = TYMEUI:GetModule("Profiles")
+local PF = TYMEUI:GetModule("Profiles")
 local module = TYMEUI:NewModule("ElvUIProfile", "AceHook-3.0")
-local profileAddonName = 'ElvUI'
-module.Enabled = true;
-module.Initialized = false;
+
+module.Enabled = true
+module.Initialized = false
+module.ReloadUI = false
+module.Name = 'ElvUI'
+
+local profileDb = E.db
 
 local _G = _G
 local next, ipairs = next, ipairs
@@ -12,7 +16,6 @@ local FCF_GetChatWindowInfo = FCF_GetChatWindowInfo
 local FCF_SetChatWindowFontSize = FCF_SetChatWindowFontSize
 local loot = LOOT:match "^.?[\128-\191]*"
 local trade = TRADE:match "^.?[\128-\191]*"
-local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
 
 -- Local Tables
 local pf = {
@@ -39,110 +42,15 @@ local pf = {
 }
 
 local SetupProfile = function()
-	-- Setup Unit Tables & Disable Info Panel
-	for _, unit in next,
-	{
-		"player",
-		"target",
-		"targettarget",
-		"targettargettarget",
-		"focus",
-		"focustarget",
-		"pet",
-		"pettarget",
-		"boss",
-		"arena",
-		"party",
-		"raid1",
-		"raid2",
-		"raid3",
-		"raidpet",
-		"tank",
-		"assist",
-	}
-	do
-		pf.unitframe.units[unit] = {
-			infoPanel = {
-				enable = false,
-			},
+	
+	for _, databar in next, { "experience", "reputation", "honor", "threat", "azerite", "petExperience" } do
+		pf.databars[databar] = {
+		  enable = false,
 		}
 	end
 
-	crushFnc(pf.databars, {
-		["threat"] = {
-			["width"] = 140,
-			["height"] = 15,
-		},
-		["honor"] = {
-			["width"] = 320,
-			["height"] = 15,
-			["showBubbles"] = true,
-		},
-		["reputation"] = {
-			["enable"] = true,
-			["textFormat"] = "CUR",
-			["width"] = 320,
-			["height"] = 15,
-			["showBubbles"] = true,
-		},
-		["statusbar"] = "Rain",
-		["experience"] = {
-			["width"] = 515,
-			["height"] = 15,
-			["showBubbles"] = true,
-		},
-		["customTexture"] = true
-	})
-
-	crushFnc(pf.datatexts, {
-		panels = {
-			MinimapPanel = {
-				enable = false
-			},
-			RightChatDataPanel = {
-				"Bags",
-				"Volume",
-				"DPS"
-			},
-			LeftChatDataPanel = {
-				[3] = "Currencies"
-			}
-		}
-	})
-
-	crushFnc(pf.movers, {
-		["QueueStatusMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,95",
-		["PetAB"] = "BOTTOM,ElvUIParent,BOTTOM,0,235",
-		["ElvAB_1"] = "BOTTOM,ElvUIParent,BOTTOM,0,191",
-		["LeftChatMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,0,3",
-		["BelowMinimapContainerMover"] = "TOPRIGHT,ElvUIParent,TOPRIGHT,-1,-262",
-		["ElvAB_4"] = "BOTTOM,ElvUIParent,BOTTOM,148,60",
-		["VehicleLeaveButton"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,552,230",
-		["AltPowerBarMover"] = "TOP,ElvUIParent,TOP,0,-53",
-		["BossButton"] = "BOTTOM,ElvUIParent,BOTTOM,214,237",
-		["ReputationBarMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,477,8",
-		["ZoneAbility"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,594,108",
-		["ElvAB_2"] = "BOTTOM,ElvUIParent,BOTTOM,0,149",
-		["AddonCompartmentMover"] = "TOPRIGHT,ElvUIParent,TOPRIGHT,-215,-28",
-		["TotemTrackerMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,417,27",
-		["BNETMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,0,208",
-		["ShiftAB"] = "BOTTOMLEFT,UIParent,BOTTOMLEFT,634,211",
-		["ThreatBarMover"] = "BOTTOMRIGHT,UIParent,BOTTOMRIGHT,-622,260",
-		["HonorBarMover"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,-476,8",
-		["ElvAB_6"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,0,295",
-		["TooltipMover"] = "TOPLEFT,ElvUIParent,TOPLEFT,510,-34",
-		["PowerBarContainerMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,322",
-		["PrivateAurasMover"] = "TOPRIGHT,ElvUIParent,TOPRIGHT,-217,-211",
-		["ElvUIBagMover"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,-274,257",
-		["MicrobarMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,27",
-		["RightChatMover"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,0,3",
-		["ExperienceBarMover"] = "BOTTOM,ElvUIParent,BOTTOM,0,8",
-		["GMMover"] = "TOPLEFT,ElvUIParent,TOPLEFT,251,-21",
-		["ElvAB_3"] = "BOTTOM,ElvUIParent,BOTTOM,-148,60"
-	})
-
-	crushFnc(pf.general, {
-		-- General AFK Mode
+	F.Table.Crush(pf.general, {
+		loginmessage = false,
 		afk = false,
 		afkChat = false,
 		afkSpin = false,
@@ -171,12 +79,27 @@ local SetupProfile = function()
 		},
 		resurrectSound = true,
 		stickyFrames = false,
-		talkingHeadFrameBackdrop = true,
+		talkingHeadFrameBackdrop = false,
+		questRewardMostValueIcon = false,
+		minimap = {
+			clusterBackdrop = false,
+			clusterDisable = false,
+		},
+		lootRoll = {
+			qualityStatusBarBackdrop = false,
+			qualityStatusBar = false,
+		},
 
 		-- General Colors
-		backdropcolor = F.Table.HexToRGB("#1a1a1a"),
-		backdropfadecolor = F.Table.HexToRGB("#292929CC"),
-		bordercolor = F.Table.HexToRGB("#000000"),
+		--backdropcolor = F.Table.HexToRGB("#1a1a1a"),
+		--backdropfadecolor = F.Table.HexToRGB("#292929CC"),
+		--bordercolor = F.Table.HexToRGB("#000000"),
+		backdropfadecolor = {
+			["a"] = 0.69,
+			["r"] = 0.13,
+			["g"] = 0.13,
+			["b"] = 0.13,
+		},
 
 		-- AltPowerBar
 		altPowerBar = {
@@ -192,7 +115,7 @@ local SetupProfile = function()
 		},
 	})
 
-	crushFnc(pf.chat, {
+	F.Table.Crush(pf.chat, {
 		panelSnapLeftID = 1,
 		tabSelector = 'BOX',
 		panelWidth = 475,
@@ -224,7 +147,121 @@ local SetupProfile = function()
 		historySize = 15,
 	})
 
-	crushFnc(pf.bags, {
+	-- Disable UnitFrames InfoPanel
+	for _, unit in next,
+	{
+		"player",
+		"target",
+		"targettarget",
+		"targettargettarget",
+		"focus",
+		"focustarget",
+		"pet",
+		"pettarget",
+		"boss",
+		"arena",
+		"party",
+		"raid1",
+		"raid2",
+		"raid3",
+		"raidpet",
+		"tank",
+		"assist",
+	}
+	do
+		pf.unitframe.units[unit] = {
+			infoPanel = {
+				enable = false,
+			},
+		}
+	end
+
+	-- Disable UnitFrames
+	for _, unit in next,
+	{
+		"player",
+		"target",
+		"targettarget",
+		"focus",
+		"pet",
+	}
+	do
+		pf.unitframe.units[unit] = {
+			enable = false
+		}
+	end
+
+	--pf.unitframe.cooldown.override = false;
+
+	F.Table.Crush(pf.actionbar, {
+		["bar1"] = {
+		  ["enabled"] = false
+		},
+		["bar3"] = {
+		  ["enabled"] = false
+		},
+		["bar4"] = {
+		  ["enabled"] = false
+		},
+		["bar5"] = {
+		  ["buttons"] = 12,
+		  ["buttonsPerRow"] = 12,
+		  ["enabled"] = false
+		},
+		["bar6"] = {
+		  ["buttons"] = 6,
+		  ["buttonsPerRow"] = 6
+		},
+		["barPet"] = {
+		  ["enabled"] = false
+		},
+		["cooldown"] = {
+		  ["override"] = false
+		},
+		["extraActionButton"] = {
+		  ["hotkeytext"] = false
+		},
+		["microbar"] = {
+		  ["buttons"] = 11
+		},
+		["stanceBar"] = {
+		  ["enabled"] = false
+		}
+	})
+
+	F.Table.Crush(pf.movers, {
+		["AddonCompartmentMover"] = "TOPRIGHT,ElvUIParent,TOPRIGHT,0,-44",
+		["PowerBarContainerMover"] = "BOTTOM,UIParent,BOTTOM,0,342",
+		["QueueStatusMover"] = "BOTTOM,UIParent,BOTTOM,0,87",
+		["VOICECHAT"] = "TOPLEFT,UIParent,TOPLEFT,253,-82",
+		["RightChatMover"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,0,0",
+		["ElvUIBagMover"] = "BOTTOMRIGHT,ElvUIParent,BOTTOMRIGHT,-274,254",
+		["LeftChatMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,0,0",
+		["BNETMover"] = "BOTTOMLEFT,ElvUIParent,BOTTOMLEFT,0,204",
+	})
+
+	F.Table.Crush(pf.cooldown, {
+		["enable"] = false,
+		["targetAura"] = false,
+	})
+
+	F.Table.Crush(pf.datatexts, {
+		panels = {
+			MinimapPanel = {
+				enable = false
+			},
+			RightChatDataPanel = {
+				"Bags",
+				"Volume",
+				"DPS"
+			},
+			LeftChatDataPanel = {
+				[3] = "Currencies"
+			}
+		}
+	})
+
+	F.Table.Crush(pf.bags, {
 		useBlizzardCleanup = false,
 		clearSearchOnClose = false,
 		junkIcon = false,
@@ -235,82 +272,19 @@ local SetupProfile = function()
 			enable = false,
 		},
 		bagBar = {
-			enable = true,
-			showBackdrop = true,
+			enable = false,
+			showBackdrop = false,
 		},
 		spinner = {
-			enable = true,
+			enable = false,
 		},
 	})
 
-	crushFnc(pf.actionbar, {
-		["chargeCooldown"] = true,
-		["useDrawSwipeOnCharges"] = true,
-		["flashAnimation"] = true,
-		["transparent"] = true,
-		["bar1"] = {
-			["buttonSize"] = 42,
-		},
-		["bar2"] = {
-			["enabled"] = true,
-			["buttonSize"] = 42,
-		},
-		["bar3"] = {
-			["buttonSize"] = 36,
-			["buttons"] = 12,
-		},
-		["bar5"] = {
-			["enabled"] = false,
-		},
-		["bar4"] = {
-			["backdrop"] = false,
-			["buttonsPerRow"] = 6,
-			["buttonSize"] = 36,
-		},
-		["bar6"] = {
-			["enabled"] = true,
-			["buttonsPerRow"] = 1,
-			["buttonSize"] = 40,
-		},
-		["barPet"] = {
-			["backdrop"] = false,
-			["buttonsPerRow"] = 10,
-		},
-		["microbar"] = {
-			["enabled"] = true,
-			["useIcons"] = false,
-			["mouseover"] = true,
-			["buttonSize"] = 24,
-			["buttons"] = 11,
-			["backdrop"] = true,
-		}
-	})
-
-	crushFnc(pf.nameplates, {
-		cutaway = {
-			health = { enable = true, },
-			power = { enable = true, },
-		},
-		threat = {
-			indicator = true,
-			enable = true,
-		},
-	})
-
-	-- ! IMPORTANT ! --
 	pf.gridSize = 76
+	pf.convertPages = true
 
 	-- Merge Tables
-	crushFnc(E.db, pf)
-
-	-- Set Globals
-	-- crushFnc(E.global, {
-	--   uiScaleInformed = true,
-
-	--   general = {
-	--     commandBarSetting = "DISABLED",
-	--   },
-	-- })
+	F.Table.Crush(E.db, pf)
 end
 
 local SetupProfilePrivate = function()
@@ -322,10 +296,11 @@ local SetupProfilePrivate = function()
 	end
 
 	F.Table.Crush(E.private, {
-
+		theme = "classic",
 		general = {
 			raidUtility = false,
 			totemTracker = false,
+			loot = false,
 			lootRoll = false,
 			queueStatus = true,
 			worldMap = false,
@@ -333,7 +308,15 @@ local SetupProfilePrivate = function()
 				enable = false
 			},
 		},
-
+		bags = {
+			enable = false
+		},
+		auras = {
+			enable = false,
+			disableBlizzard = false,
+			buffsHeader = false,
+			debuffsHeader = false
+		},
 		unitframe = {
 			enable = false,
 			disabledBlizzardFrames = {
@@ -347,41 +330,18 @@ local SetupProfilePrivate = function()
 				raid = false,
 			}
 		},
-
-		actionbar = {
-			enable = true,
-			hideCooldownBling = false,
-			masque = {
-				actionbars = true,
-				petBar = true,
-				stanceBar = true,
-			},
-		},
-
 		nameplates = {
-			enable = true,
+			enable = false,
 		},
-
+		actionbar = {
+			enable = false
+		},
 		tooltip = {
 			enable = false,
 		},
-
 		chat = {
 			enable = true,
 		},
-
-		bags = {
-			enable = isBagsEnabled,
-			bagBar = true
-		},
-
-		auras = {
-			enable = false,
-			disableBlizzard = false,
-			buffsHeader = false,
-			debuffsHeader = false
-		},
-
 		skins = {
 			ace3Enable = true,
 			libDropdown = true,
@@ -389,7 +349,7 @@ local SetupProfilePrivate = function()
 			parchmentRemoverEnable = false,
 			blizzard = {
 				enable = true,
-				eventLog = true,
+				eventLog = false,
 				worldmap = false,
 				achievement = false,
 				addonManager = false,
@@ -490,21 +450,14 @@ local SetupProfilePrivate = function()
 				weeklyRewards = false,
 			}
 		},
-
-		theme = "classic"
 	})
 end
 
 local SetuProfileGlobal = function()
 	F.Table.Crush(E.global, {
-		-- General
 		general = {
-			-- ultrawide = false,
-			-- UIScale = 0.6,
-			-- WorldMapCoordinates = {
-			--   position = "BOTTOMRIGHT",
-			-- },
-
+			ultrawide = false,
+			UIScale = 0.64,
 			AceGUI = {
 				width = 1070,
 				height = 833,
@@ -530,28 +483,30 @@ local function SetupChat()
 end
 
 function module:LoadProfile()
-	SetupProfile()
-	SetupProfilePrivate()
-	SetuProfileGlobal()
-	SetupChat()
+	if PF:ElvUIInstallComplete() == true then 
+		SetupProfile()
+		SetupProfilePrivate()
+		SetuProfileGlobal()
+		SetupChat()
+		return true
+	else
+		return false
+	end
 end
 
 function module:Initialize()
     -- Don't init second time
-    if not self.Enabled then
-        F.Chat('chat', self:GetName()..' is not enabled.');
-		return
-    end
-
     if self.Initialized then return end
 
-    if Profiles:IsAddOnLoaded(profileAddonName, E.db) then
-        self:LoadProfile()
+    if PF:CanLoadProfileForAddon(module.Name, profileDb) then
+        local loaded = self:LoadProfile()
+        if loaded == true then
+            module.ReloadUI = true
+            TYMEUI:PrintMessage(module.Name..' => Profile Loaded')
+			-- We are done, hooray!
+			self.Initialized = true
+        end
     end
-    
-    -- We are done, hooray!
-    self.Initialized = true
-    F.Chat('chat', self:GetName()..':Initialized()');
 end
 
-Profiles:RegisterProfile(module)
+PF:RegisterProfile(module)

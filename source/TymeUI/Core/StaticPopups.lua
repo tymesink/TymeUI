@@ -6,7 +6,7 @@ E.PopupDialogs.RESET_PROFILE = {
 	button1 = ACCEPT,
 	button2 = CANCEL,
 	OnAccept = function(self)
-    	TYMEUI.db.profile.profileModule.Initialized = false
+    	TYMEUI.db.profile.ProfileAddons = {}
     	ReloadUI()
 	end,
 	showAlert = true,

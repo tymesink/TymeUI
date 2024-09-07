@@ -1,6 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Script file='ElvUI.lua' />
-  <Script file='Masque.lua' />
   <Script file='EditModeExpanded.lua' />
   <Script file='Details.lua' />
   <Script file='Narcissus.lua' />

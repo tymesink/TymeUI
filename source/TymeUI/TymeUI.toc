@@ -7,7 +7,7 @@
 ## DefaultState: Enabled
 ## X-Interface: 110002
 ## X-Flavor: Mainline
-## X-ElvUIVersion: 13.74
+## X-ElvUIVersion: 13.76
 ## X-GitHash: v0.1.0-beta.1
 
 Initialize.lua

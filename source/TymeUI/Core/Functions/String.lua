@@ -7,26 +7,13 @@ local gsub = string.gsub
 local strmatch = strmatch
 local strtrim = strtrim
 local type = type
+local tonumber = tonumber
 local utf8len = string.utf8len
 local utf8lower = string.utf8lower
 local utf8sub = string.utf8sub
 local utf8upper = string.utf8upper
 
-F.String = {
-  Menu = {},
-}
-
-function F.String.Color(msg, color)
-  if type(color) == "string" then
-    return "|cff" .. color .. msg .. "|r"
-  else
-    return "|cff" .. I.Strings.Colors[color] .. msg .. "|r"
-  end
-end
-
-function F.String.Sublist(msg)
-  return "\n  - |cffbdbdbd" .. msg .. "|r"
-end
+F.String = {}
 
 function F.String.HexToRGB(hex)
   local r, g, b, a = strmatch(hex, "^#?(%x%x)(%x%x)(%x%x)(%x?%x?)$")
@@ -34,30 +21,21 @@ function F.String.HexToRGB(hex)
   return tonumber(r, 16) / 255, tonumber(g, 16) / 255, tonumber(b, 16) / 255, (a ~= "") and (tonumber(a, 16) / 255) or nil
 end
 
-function F.String.FastRGB(r, g, b)
-  return format("%02x%02x%02x", r * 255, g * 255, b * 255)
-end
+function F.String.HexToRGBA(hex)
+  -- Remove the |c prefix
+  hex = hex:gsub("|c", "")
+    
+  local alphaHex = hex:sub(1, 2)
+  local redHex = hex:sub(3, 4)
+  local greenHex = hex:sub(5, 6)
+  local blueHex = hex:sub(7, 8)
+  
+  local alpha = tonumber(alphaHex, 16) / 255
+  local red = tonumber(redHex, 16) / 255
+  local green = tonumber(greenHex, 16) / 255
+  local blue = tonumber(blueHex, 16) / 255
 
-function F.String.FastRGBA(r, g, b, a)
-  return format("%02x%02x%02x%02x", (a or 1) * 255, r * 255, g * 255, b * 255)
-end
-
-function F.String.RGB(msg, colors)
-  if colors.r then
-    return F.String.Color(msg, F.String.FastRGB(colors.r, colors.g, colors.b))
-  else
-    return F.String.Color(msg, F.String.FastRGB(colors[1], colors[2], colors[3]))
-  end
-end
-
-function F.String.ElvUI(msg)
-  if not msg or msg == "" then return F.String.Color("ElvUI", I.Enum.Colors.ELVUI) end
-
-  return F.String.Color(msg, I.Enum.Colors.ELVUI)
-end
-
-function F.String.ElvUIValue(msg)
-  return F.String.RGB(msg, E.media.rgbvaluecolor)
+  return alpha, red, green, blue
 end
 
 function F.String.Class(msg, class)
@@ -66,19 +44,6 @@ function F.String.Class(msg, class)
   local color = E:ClassColor(finalClass, true)
   return F.String.Color(msg, F.String.FastRGB(color.r, color.g, color.b))
 end
-
-function F.String.Error(msg)
-  return F.String.Color(msg, I.Enum.Colors.ERROR)
-end
-
-function F.String.Good(msg)
-  return F.String.Color(msg, I.Enum.Colors.GOOD)
-end
-
-function F.String.Warning(msg)
-  return F.String.Color(msg, I.Enum.Colors.WARNING)
-end
-
 
 -- Capture the following strings
 -- .+%s(.+)$
@@ -193,8 +158,6 @@ function F.String.StripTexture(text)
   end)
 end
 
-
-
 function F.String.StripColor(text)
   if type(text) ~= "string" then return text end
   -- Remove |c...|r format
@@ -216,80 +179,4 @@ end
 
 function F.String.Trim(text)
   return strmatch(text, "^%s*(.*%S)") or ""
-end
-
-function F.String.FastGradient(text, r1, g1, b1, r2, g2, b2)
-  local msg, len, idx = "", utf8len(text), 0
-
-  for i = 1, len do
-    local x = utf8sub(text, i, i)
-    if strmatch(x, "%s") then
-      msg = msg .. x
-      idx = idx + 1
-    else
-      local relperc = (idx / len)
-
-      if not r2 then
-        msg = msg .. "|cff" .. F.String.FastRGB(r1, g1, b1) .. x .. "|r"
-      else
-        local r, g, b = F.FastColorGradient(relperc, r1, g1, b1, r2, g2, b2)
-        msg = msg .. "|cff" .. F.String.FastRGB(r, g, b) .. x .. "|r"
-        idx = idx + 1
-      end
-    end
-  end
-
-  return msg
-end
-
-function F.String.Rainbow(text)
-  -- Define a table of color codes for the rainbow
-  local colors = {
-    "|cFFFF0000", -- Red
-    "|cFFFF7F00", -- Orange
-    "|cFFFFFF00", -- Yellow
-    "|cFF00FF00", -- Green
-    "|cFF0000FF", -- Blue
-    "|cFF4B0082", -- Indigo
-    "|cFF8B00FF", -- Violet
-  }
-
-  -- The resulting string
-  local result = ""
-
-  -- Length of the text
-  local textLength = string.len(text)
-
-  -- Iterate through each character of the input text
-  for i = 1, textLength do
-    -- Select color based on the current character position mod the number of colors
-    local color = colors[((i - 1) % #colors) + 1]
-
-    -- Append the colored character to the result string
-    result = result .. color .. string.sub(text, i, i) .. "|r"
-  end
-
-  return result
-end
-
-function F.String.FastGradientHex(text, h1, h2)
-  local r2, g2, b2
-  local r1, g1, b1 = F.String.HexToRGB(h1)
-
-  if h2 then
-    r2, g2, b2 = F.String.HexToRGB(h2)
-  else
-    local h, s, l = F.ConvertToHSL(r1, g1, b1)
-    r1, g1, b1 = F.ConvertToRGB(F.ClampToHSL(h, s * 0.95, l * 1.2))
-    r2, g2, b2 = F.ConvertToRGB(F.ClampToHSL(h, s * 1.35, l * 0.85))
-  end
-
-  return F.String.FastGradient(text, r1, g1, b1, r2, g2, b2)
-end
-
-function F.String.FastColorGradientHex(percentage, h1, h2)
-  local r1, g1, b1 = F.String.HexToRGB(h1)
-  local r2, g2, b2 = F.String.HexToRGB(h2)
-
-  return F.FastColorGradient(percentage, r1, g1, b1, r2, g2, b2)
 end

@@ -34,6 +34,7 @@ function TYMEUI:HandleOptionsChatCommand(msg)
     SettingsPanel.AddOnsTab:Click();
 end
 
+
 function TYMEUI:LoadCommands()
     self:RegisterChatCommand("addon", "HandleAddonsChatCommand")
     self:RegisterChatCommand("addons", "HandleAddonsChatCommand")

@@ -1,13 +1,15 @@
 local TYMEUI, F, I, E = unpack(TymeUI)
-local Profiles = TYMEUI:GetModule("Profiles")
+local PF = TYMEUI:GetModule("Profiles")
 local module = TYMEUI:NewModule("ChocolateBarProfile", "AceHook-3.0")
-local profileAddonName = 'ChocolateBar'
-local profileDb = ChocolateBarDB
-module.Enabled = true;
-module.Initialized = false;
-local crushFnc = TYMEUI.DevRelease and F.Table.CrushDebug or F.Table.Crush
 
-local default = {
+module.Enabled = true
+module.Initialized = false
+module.ReloadUI = false
+module.Name = 'ChocolateBar'
+
+local profileDb = ChocolateBarDB
+
+local profileDbDefault = {
     ["fixedStrata"] = true,
     ["objSettings"] = {
         ["|cffffb366Ara|r Reputations"] = {
@@ -142,29 +144,27 @@ local default = {
 function module:LoadProfile()
     local defaultProfile = profileDb.profiles['Default']
     if not defaultProfile then
-        F.Chat('chat', 'Default profile not found in ChocolateBarDB.')
-        return
+        TYMEUI:PrintMessage('Default profile not found in ChocolateBarDB.')
+        return false
     end
     local defaultProfile = profileDb.profiles['Default'];
-    crushFnc(defaultProfile, default) -- Merge Tables
+    F.Table.Crush(defaultProfile, profileDbDefault) -- Merge Tables
+    return true
 end
 
 function module:Initialize()
     -- Don't init second time
-    if not self.Enabled then
-        F.Chat('chat', self:GetName()..' is not enabled.');
-        return
-    end
-
     if self.Initialized then return end
 
-    if Profiles:IsAddOnLoaded(profileAddonName, profileDb) then
-        self:LoadProfile()
+    if PF:CanLoadProfileForAddon(module.Name, profileDb) then
+        local loaded = self:LoadProfile()
+        if loaded then
+            module.ReloadUI = true
+            TYMEUI:PrintMessage(module.Name..' => Profile Loaded')
+            -- We are done, hooray!
+			self.Initialized = true
+        end
     end
-    
-    -- We are done, hooray!
-    self.Initialized = true
-    F.Chat('chat', self:GetName()..':Initialized()');
 end
 
-Profiles:RegisterProfile(module)
+PF:RegisterProfile(module)

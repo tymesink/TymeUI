@@ -83,13 +83,11 @@ function F.Log.Dump(...)
 end
 
 function F.Log.ThrowError(_, ...)
-  _G.geterrorhandler()(format("%s %s\n%s", TYMEUI.Title, F.String.Error("[ERROR]"), F.Log.Dump(...)))
+  _G.geterrorhandler()(format("%s %s\n%s", I.Constants.ADDON_NAME_COLOR, F.String.Error("[ERROR]"), F.Log.Dump(...)))
 end
 
 function F.Log.Print(str)
-  local chatRedirect = E.db and E.db.general and _G[E.db.general.messageRedirect] or DEFAULT_CHAT_FRAME
-  chatRedirect:AddMessage(str)
-  if _G["DLAPI"] then _G["DLAPI"].DebugLog(TYMEUI.Title, str) end
+  if _G["DLAPI"] then _G["DLAPI"].DebugLog(I.Constants.ADDON_NAME_COLOR, str) end
 end
 
 do

@@ -23,7 +23,6 @@ _G["TymeUI"] = Engine
 TYMEUI.AddOnName = AddonName
 TYMEUI.GitHash = GetAddOnMetadata(AddonName, "X-GitHash")
 TYMEUI.DebugMode = false
-TYMEUI.DevTag = ""
 TYMEUI.DelayedWorldEntered = false
 TYMEUI.MetaFlavor = GetAddOnMetadata(AddonName, "X-Flavor")
 TYMEUI.ClientBuildVersion = select(4, GetBuildInfo())
@@ -31,9 +30,7 @@ TYMEUI.Version = GetAddOnMetadata(AddonName, "Version")
 
 local defaults = {
   profile = {
-      profileModule = {
-          Initialized = false,
-      }
+    ProfileAddons = {}
   }
 }
 
@@ -47,18 +44,7 @@ function TYMEUI:Initialize()
 
     -- Call pre init for ourselfs
     self:ModulePreInitialize(self)
-  
-    -- Mark dev release
-    if self.GitHash then
-      if find(self.GitHash, "alpha") then
-        self.DevTag = F.String.Error("[ALPHA]")
-      elseif find(self.GitHash, "beta") then
-        self.DevTag = F.String.Error("[BETA]")
-      elseif find(self.GitHash, "project%-version") then
-        self.GitHash = "DEV" -- will be filled by changelog
-        self.DevTag = F.String.Error("[DEV]")
-      end
-    end
+    
   
     -- Set correct log level
     -- Higher number = more in-depth logs
@@ -71,7 +57,7 @@ function TYMEUI:Initialize()
     local RequiredVersion = tonumber(RequiredVersionString)
   
     E.PopupDialogs.ELVUI_MINIMUM_VERSION_REQUIRED = {
-      text = I.Strings.Branding.Title
+      text = I.Constants.ADDON_NAME_COLOR
         .. " did not load because your version of |cff1784d1ElvUI|r |cffef5350"
         .. E.versionString
         .. "|r is insufficient.\n\nPlease install |cff1784d1ElvUI|r version |cff66bb6a"
