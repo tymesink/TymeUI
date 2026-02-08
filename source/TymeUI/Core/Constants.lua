@@ -3,7 +3,7 @@ local TYMEUI, F, I, E = unpack(TymeUI)
 I.Constants = {}
 
 I.Constants.AddonName = "TymeUI"
-I.Constants.AddonProfileKey = TYMEUI.AddOnName..'-'..E.mynameRealm
+I.Constants.AddonProfileKey = TYMEUI.AddOnName..'-'..(TYMEUI.PlayerNameRealm or E.mynameRealm or "player")
 I.Constants.ADDON_NAME_COLOR = "|cff0062ffTyme|r|cff0DEB11UI|r";
 
 I.Constants.layout = {

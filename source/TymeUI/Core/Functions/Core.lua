@@ -1,5 +1,5 @@
 ﻿local TYMEUI, F, I, E = unpack(TymeUI)
-local LSM = E.Libs.LSM
+local LSM = LibStub("LibSharedMedia-3.0", true)
 
 local _G = _G
 local abs = math.abs
@@ -65,7 +65,8 @@ function F.ConvertFromHue(m1, m2, h)
 end
 
 function F.IsAddOnEnabled(addon)
-	return (C_AddOns and GetAddOnEnableState(addon, E.myname) or GetAddOnEnableState(E.myname, addon)) == 2 and IsAddOnLoaded(addon)
+	local name = E and E.myname or UnitName("player")
+	return (C_AddOns and GetAddOnEnableState(addon, name) or GetAddOnEnableState(name, addon)) == 2 and IsAddOnLoaded(addon)
 end
 
 function F.IsAddOnLoaded(addon)

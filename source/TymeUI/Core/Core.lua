@@ -31,7 +31,9 @@ end
 
 function TYMEUI:InitializeModules()
 	-- Update cooldown text settings
-	E:UpdateCooldownSettings("all")
+	if E and E.UpdateCooldownSettings then
+		E:UpdateCooldownSettings("all")
+	end
 	self:PrintMessage('Core/Core.lua => Initializing Modules')
 
 	-- All other modules that are registered the normal way

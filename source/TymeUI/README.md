@@ -1,2 +1,2 @@
 # TymeUI
-Personal Addon that I've had over the years. provides shortucts and playing around with some lua.
+Personal addon with some shortcuts and experiments. No longer depends on ElvUI; runs as a standalone Ace addon.

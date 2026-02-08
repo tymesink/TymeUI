@@ -133,7 +133,8 @@ end
   end
 
 function F.Table.CurrentClassColor()
-	local color = E:ClassColor(E.myclass, true)
+	local class = select(2, UnitClass("player"))
+	local color = RAID_CLASS_COLORS[class] or { r = 1, g = 1, b = 1 }
 
 	return F.Table.RGB(color.r, color.g, color.b)
 end

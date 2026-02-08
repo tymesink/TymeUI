@@ -77,13 +77,20 @@ local initializeProfiles = function()
             profileDb[name] = F.Deepcopy(moduleDefault)
         end
 
-		profileDb[name].Enabled = isProfileEnabled(module)
+		local addonEnabled = F.IsAddOnEnabled(name)
+		profileDb[name].Enabled = isProfileEnabled(module) and addonEnabled
+
 		if profileDb[name].Enabled == true then
 			local profileLoaded = profileDb[name].ProfileLoaded
 			if(profileLoaded == false) then
 				loadProfile(module)
 			else
 				TYMEUI:PrintMessage('Profiles => ' .. name .. ' Already loaded')	
+			end
+		else
+			profileDb[name].ProfileLoaded = false
+			if not addonEnabled then
+				TYMEUI:PrintMessage(name .. ' => is not available')
 			end
 		end
     end
@@ -101,10 +108,6 @@ function Profiles:Initialize()
 
 	
 	TYMEUI:RegisterChatCommand("resetprofile", "HandleResetProfileCommand")
-
-	if(self:ElvUIInstallComplete() == false) then
-		return
-	end
 
 	initializeProfiles()
 
@@ -137,14 +140,6 @@ function Profiles:CanLoadProfileForAddon(name, profiledb)
 		return false
 	end
 
-	return true
-end
-
-function Profiles:ElvUIInstallComplete()
-	if not E.private.install_complete then
-		TYMEUI:PrintMessage('ElvUI initial install not complete, skipping profile setup');
-		return false
-	end
 	return true
 end
 

@@ -1,5 +1,5 @@
 local TYMEUI, F, I, E = unpack(TymeUI)
-local LSM = E.Libs.LSM
+local LSM = LibStub("LibSharedMedia-3.0", true)
 local format, ipairs, type, pcall = format, ipairs, type, pcall
 
 TYMEUI.Media = {

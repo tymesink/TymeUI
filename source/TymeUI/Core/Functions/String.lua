@@ -15,6 +15,8 @@ local utf8upper = string.utf8upper
 
 F.String = {}
 
+E.TagFunctions = E.TagFunctions or {}
+
 function F.String.HexToRGB(hex)
   local r, g, b, a = strmatch(hex, "^#?(%x%x)(%x%x)(%x%x)(%x?%x?)$")
   if not r then return 0, 0, 0, nil end

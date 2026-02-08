@@ -26,7 +26,6 @@ local profileDbDefault = {
         ["Cooldowns"] = {
             ["primaryWidth"] = 36,
             ["rel"] = "CENTER",
-            ["elvuiCooldown"] = true,
             ["queue"] = {
                 ["direction"] = "LEFT",
                 ["width"] = 30,
@@ -37,13 +36,11 @@ local profileDbDefault = {
             ["primaryHeight"] = 36,
         },
         ["Primary"] = {
-            ["elvuiCooldown"] = true,
             ["primaryWidth"] = 42,
             ["rel"] = "CENTER",
             ["queue"] = {
                 ["direction"] = "LEFT",
                 ["width"] = 36,
-                ["elvuiCooldown"] = true,
                 ["anchor"] = "LEFT",
                 ["height"] = 36,
             },
@@ -57,7 +54,6 @@ local profileDbDefault = {
             ["queue"] = {
                 ["direction"] = "LEFT",
                 ["width"] = 36,
-                ["elvuiCooldown"] = true,
                 ["anchor"] = "LEFT",
                 ["height"] = 36,
             },
