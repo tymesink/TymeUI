@@ -1,12 +1,10 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
   <Script file='EditModeExpanded.lua' />
-  <Script file='Details.lua' />
   <Script file='Narcissus.lua' />
   <Script file='Bagnon.lua' />
   <Script file='ChocolateBar.lua' />
   <Script file='DragonRider.lua' />
   <Script file='SimpleAddonManager.lua' />
-  <Script file='Hekili.lua' />
   <Script file='DBM-Core.lua' />
   <Script file='SavedInstances.lua' />
   <Script file='TomTom.lua' />

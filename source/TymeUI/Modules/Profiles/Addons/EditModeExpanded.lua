@@ -1,13 +1,5 @@
-local TYMEUI, F, I, E = unpack(TymeUI)
+local TYMEUI, F = unpack(TymeUI)
 local PF = TYMEUI:GetModule("Profiles")
-local module = TYMEUI:NewModule("EditModeExpandedProfile", "AceHook-3.0")
-
-module.Enabled = true
-module.Initialized = false
-module.ReloadUI = false
-module.Name = 'EditModeExpanded'
-
-local profileDb = EditModeExpandedADB
 local EditModeManagerFrame = EditModeManagerFrame
 local profileDbDefault = {
     profileKeys = {},
@@ -563,31 +555,10 @@ local setCustomLayoutProfile = function(profileName)
 end
 
 
-function module:LoadProfile()
-    local profileName = getCurrentLayoutName();
+PF:NewProfileModule('EditModeExpanded', function() return EditModeExpandedADB end, function(profileDb)
+    local profileName = getCurrentLayoutName()
     local layoutProfile = setCustomLayoutProfile(profileName)
-    F.Table.Crush(profileDbDefault.global, layoutProfile) 
+    F.Table.Crush(profileDbDefault.global, layoutProfile)
+    F.Table.Crush(profileDb, profileDbDefault)
     return true
-end
-
-function module:Initialize()
-    if not self.Enabled then
-        TYMEUI:PrintMessage(module.ModuleName..' is not enabled.');
-        return
-    end
-
-    -- Don't init second time
-    if self.Initialized then return end
-
-    if PF:CanLoadProfileForAddon(module.Name, profileDb) then
-        local loaded = self:LoadProfile()
-        if loaded == true then
-            module.ReloadUI = true
-            TYMEUI:PrintMessage(module.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
-            -- We are done, hooray!
-			self.Initialized = true
-        end
-    end
-end
-
-PF:RegisterProfile(module)
+end)

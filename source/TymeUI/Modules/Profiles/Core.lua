@@ -85,7 +85,7 @@ local initializeProfiles = function()
 			if(profileLoaded == false) then
 				loadProfile(module)
 			else
-				TYMEUI:PrintMessage('Profiles => ' .. name .. ' Already loaded')	
+				TYMEUI:PrintMessage('Profiles => ' .. name .. ' already initialized.  Skipping...')	
 			end
 		else
 			profileDb[name].ProfileLoaded = false
@@ -120,6 +120,13 @@ function Profiles:Initialize()
 	self.Initialized = true
 end
 
+function Profiles:MarkModuleLoaded(name, loaded)
+	if not profileDb[name] then
+		profileDb[name] = F.Deepcopy(moduleDefault)
+	end
+	profileDb[name].ProfileLoaded = loaded
+end
+
 function Profiles:RegisterProfile(module)
 	if not module then return end
 	
@@ -129,7 +136,7 @@ function Profiles:RegisterProfile(module)
     end
 end
 
-function Profiles:CanLoadProfileForAddon(name, profiledb)	
+function Profiles:CanLoadProfileForAddon(name, profiledb)
 	if not F.IsAddOnEnabled(name) then
 		TYMEUI:PrintMessage(name .. ' => is not available');
 		return false
@@ -141,6 +148,47 @@ function Profiles:CanLoadProfileForAddon(name, profiledb)
 	end
 
 	return true
+end
+
+-- Shared scaffolding for the common case: an addon-profile module that just
+-- mutates the target addon's SavedVariables synchronously in LoadProfile and
+-- returns true/false. Modules with unusual init needs (e.g. SimpleAddonManager,
+-- which has to defer and retry) still define Initialize/LoadProfile by hand.
+--
+-- getTargetDb is a zero-arg function, e.g. `function() return WIM3_Data end`,
+-- NOT the SavedVariables table itself. TymeUI's own profile files load in
+-- their own addon's load order, which can run before the target addon has
+-- loaded and populated its SavedVariables global -- capturing that global
+-- directly at file-parse time can permanently freeze a stale nil reference
+-- for the whole session. Resolving it lazily here, inside Initialize (which
+-- only runs at PLAYER_LOGIN, after every addon has finished loading), avoids
+-- that race.
+function Profiles:NewProfileModule(name, getTargetDb, loadProfileFn)
+	local module = TYMEUI:NewModule(name .. "Profile", "AceHook-3.0")
+
+	module.Enabled = true
+	module.Initialized = false
+	module.ReloadUI = false
+	module.Name = name
+
+	function module:Initialize()
+		-- Don't init second time
+		if self.Initialized then return end
+
+		local targetDb = getTargetDb()
+		if Profiles:CanLoadProfileForAddon(self.Name, targetDb) then
+			local loaded = loadProfileFn(targetDb)
+			if loaded then
+				self.ReloadUI = true
+				TYMEUI:PrintMessage(self.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
+				-- We are done, hooray!
+				self.Initialized = true
+			end
+		end
+	end
+
+	Profiles:RegisterProfile(module)
+	return module
 end
 
 TYMEUI:RegisterModule(Profiles:GetName())

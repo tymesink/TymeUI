@@ -18,51 +18,6 @@ local addonsToEnable = {
     ["BlizzMove"] = true,
     ["Broker_PlayedTime"] = true,
     ["ChocolateBar"] = true,
-    ["DBM-Affixes"] = true,
-    ["DBM-BfA"] = true,
-    ["DBM-Brawlers"] = true,
-    ["DBM-BrokenIsles"] = true,
-    ["DBM-Cataclysm"] = true,
-    ["DBM-Challenges"] = true,
-    ["DBM-Core"] = true,
-    ["DBM-CountPack-Overwatch"] = true,
-    ["DBM-Delves-WarWithin"] = true,
-    ["DBM-Draenor"] = true,
-    ["DBM-DragonIsles"] = true,
-    ["DBM-GUI"] = true,
-    ["DBM-KhazAlgar"] = true,
-    ["DBM-Legion"] = true,
-    ["DBM-Party-BC"] = true,
-    ["DBM-Party-BfA"] = true,
-    ["DBM-Party-Cataclysm"] = true,
-    ["DBM-Party-Dragonflight"] = true,
-    ["DBM-Party-Legion"] = true,
-    ["DBM-Party-MoP"] = true,
-    ["DBM-Party-Shadowlands"] = true,
-    ["DBM-Party-Vanilla"] = true,
-    ["DBM-Party-WarWithin"] = true,
-    ["DBM-Party-WoD"] = true,
-    ["DBM-Party-WotLK"] = true,
-    ["DBM-PvP"] = true,
-    ["DBM-Raids-BfA"] = true,
-    ["DBM-Raids-BrokenIsles"] = true,
-    ["DBM-Raids-Cata"] = true,
-    ["DBM-Raids-Dragonflight"] = true,
-    ["DBM-Raids-Legion"] = true,
-    ["DBM-Raids-MoP"] = true,
-    ["DBM-Raids-Vanilla"] = true,
-    ["DBM-Raids-WarWithin"] = true,
-    ["DBM-Raids-WoD"] = true,
-    ["DBM-Raids-WoTLK"] = true,
-    ["DBM-Scenario-MoP"] = true,
-    ["DBM-SoundEventsPack"] = true,
-    ["DBM-StatusBarTimers"] = true,
-    ["DBM-Test"] = true,
-    ["DBM-Test-WarWithin"] = true,
-    ["DBM-TimelessIsle"] = true,
-    ["DBM-VPVEM"] = true,
-    ["DBM-WorldEvents"] = true,
-    ["Details"] = true,
     ["DragonRider"] = true,
     ["EditModeExpanded"] = true,
     ["InFlight"] = true,
@@ -96,6 +51,36 @@ local countKeys = function(table)
         count = count + 1
     end
     return count
+end
+
+local function runProfileCommand()
+    local chatMessage = "/sam profile Default-Addons ignore"
+    local editbox = DEFAULT_CHAT_FRAME and ChatEdit_ChooseBoxForSend(DEFAULT_CHAT_FRAME)
+
+    -- Chat frame globals aren't always ready this early, retry shortly.
+    if not editbox or not ChatEdit_ActivateChat or (not ChatEdit_OnEnterPressed and not ChatEdit_SendText) then
+        module.RetryCount = (module.RetryCount or 0) + 1
+        if module.RetryCount <= 20 then
+            C_Timer.After(0.5, runProfileCommand)
+        else
+            TYMEUI:PrintMessage(module.Name .. ' => Chat UI never became ready, could not run profile command')
+        end
+        return
+    end
+    module.RetryCount = nil
+
+    ChatEdit_ActivateChat(editbox)
+    editbox:SetText(chatMessage)
+    if ChatEdit_SendText then
+        ChatEdit_SendText(editbox, 0)
+    else
+        ChatEdit_OnEnterPressed(editbox)
+    end
+
+    module.Initialized = true
+    PF:MarkModuleLoaded(module.Name, true)
+    TYMEUI:PrintMessage(module.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
+    TYMEUI:StaticPopup_ReloadUI()
 end
 
 function module:LoadProfile()
@@ -134,12 +119,12 @@ function module:LoadProfile()
         addons = addonsToEnable,
     }
 
-    local chatMessage = "/sam profile Default-Addons ignore"
-    local editbox = ChatEdit_ChooseBoxForSend(DEFAULT_CHAT_FRAME)
-    ChatEdit_ActivateChat(editbox)
-    editbox:SetText(chatMessage)
-    ChatEdit_OnEnterPressed(editbox)
-    return true
+    -- SimpleAddonManager runs its own PLAYER_LOGIN init in the same event dispatch as ours,
+    -- so running its slash command synchronously here can race ahead of that init and crash
+    -- inside SAM itself. Defer so SAM's own PLAYER_LOGIN handler finishes first; completion
+    -- (module.Initialized / reload prompt) is handled by runProfileCommand once it actually runs.
+    C_Timer.After(2, runProfileCommand)
+    return false
 end
 
 function module:Initialize()
@@ -147,13 +132,7 @@ function module:Initialize()
      if self.Initialized then return end
 
     if PF:CanLoadProfileForAddon(module.Name, profileDb) then
-        local loaded = self:LoadProfile()
-        if loaded then
-            module.ReloadUI = true
-            TYMEUI:PrintMessage(module.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
-            -- We are done, hooray!
-			self.Initialized = true
-        end
+        self:LoadProfile()
     else
         TYMEUI:PrintMessage(module.Name..' => Can not load profile')
     end

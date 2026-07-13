@@ -1,33 +1,7 @@
-local TYMEUI, F, I, E = unpack(TymeUI)
+local TYMEUI = unpack(TymeUI)
 local PF = TYMEUI:GetModule("Profiles")
-local module = TYMEUI:NewModule("DBM-CoreProfile", "AceHook-3.0")
 
-module.Enabled = true
-module.Initialized = false
-module.ReloadUI = false
-module.Name = 'DBM-Core'
-
-local profileDb = DBM_MinimapIcon
-
-function module:LoadProfile()
+PF:NewProfileModule('DBM-Core', function() return DBM_MinimapIcon end, function(profileDb)
 	profileDb.hide = true
 	return true
-end
-
-function module:Initialize()
-	-- Don't init second time
-	if self.Initialized then return end
-
-	if PF:CanLoadProfileForAddon(module.Name, profileDb) then
-		local loaded = self:LoadProfile()
-		if loaded then
-			module.ReloadUI = true
-			TYMEUI:PrintMessage(module.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
-
-			-- We are done, hooray!
-			self.Initialized = true
-		end
-	end
-end
-
-PF:RegisterProfile(module)
+end)

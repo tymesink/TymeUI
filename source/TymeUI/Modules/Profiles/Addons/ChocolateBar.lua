@@ -1,13 +1,5 @@
-local TYMEUI, F, I, E = unpack(TymeUI)
+local TYMEUI, F = unpack(TymeUI)
 local PF = TYMEUI:GetModule("Profiles")
-local module = TYMEUI:NewModule("ChocolateBarProfile", "AceHook-3.0")
-
-module.Enabled = true
-module.Initialized = false
-module.ReloadUI = false
-module.Name = 'ChocolateBar'
-
-local profileDb = ChocolateBarDB
 
 local profileDbDefault = {
     ["fixedStrata"] = true,
@@ -51,18 +43,6 @@ local profileDbDefault = {
         },
         ["Time Played"] = {
             ["index"] = 3,
-            ["isNew"] = false,
-            ["barName"] = "ChocolateBar1",
-        },
-        ["Hekili"] = {
-            ["index"] = 13,
-            ["align"] = "right",
-            ["isNew"] = false,
-            ["barName"] = "ChocolateBar1",
-        },
-        ["Details"] = {
-            ["index"] = 12,
-            ["align"] = "right",
             ["isNew"] = false,
             ["barName"] = "ChocolateBar1",
         },
@@ -141,30 +121,13 @@ local profileDbDefault = {
     },
 }
 
-function module:LoadProfile()
-    local defaultProfile = profileDb.profiles['Default']
-    if not defaultProfile then
-        TYMEUI:PrintMessage('Default profile not found in ChocolateBarDB.')
-        return false
-    end
-    local defaultProfile = profileDb.profiles['Default'];
-    F.Table.Crush(defaultProfile, profileDbDefault) -- Merge Tables
-    return true
-end
+PF:NewProfileModule('ChocolateBar', function() return ChocolateBarDB end, function(profileDb)
+	local defaultProfile = profileDb.profiles['Default']
+	if not defaultProfile then
+		TYMEUI:PrintMessage('Default profile not found in ChocolateBarDB.')
+		return false
+	end
 
-function module:Initialize()
-    -- Don't init second time
-    if self.Initialized then return end
-
-    if PF:CanLoadProfileForAddon(module.Name, profileDb) then
-        local loaded = self:LoadProfile()
-        if loaded then
-            module.ReloadUI = true
-            TYMEUI:PrintMessage(module.Name .. ' => Profile Loaded', I.Constants.ColorHex.brightblue)
-            -- We are done, hooray!
-			self.Initialized = true
-        end
-    end
-end
-
-PF:RegisterProfile(module)
+	F.Table.Crush(defaultProfile, profileDbDefault) -- Merge Tables
+	return true
+end)
