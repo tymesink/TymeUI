@@ -1,11 +1,11 @@
-## Interface: 120000, 120001
+## Interface: 120100
 ## Title: |cff1784d1TymeUI|r
 ## Version: 1.0
 ## Author: Tymesink
 ## SavedVariables: TymeUIDB
 ## RequiredDeps: SimpleAddonManager
 ## DefaultState: Enabled
-## X-Interface: 110002
+## X-Interface: 120100
 ## X-Flavor: Mainline
 ## X-GitHash: v0.1.0-beta.1
 
