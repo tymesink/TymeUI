@@ -21,12 +21,6 @@ libraries beyond the three bundled in `Libraries/`.
 - `Tyme-Latency` — home and world latency, with incoming/outgoing bandwidth
 - `ClickCastHelper` — launcher that toggles Blizzard's click-binding frame
 
-**Sound pack** — `SoundPack.lua`
-
-Registers the bundled sounds with LibSharedMedia so other addons (DBM,
-WeakAuras, ...) can select them. Optional: without LibSharedMedia loaded the
-addon works fine, the sounds are just not offered elsewhere.
-
 **Auction sound** — `Features/AuctionSounds.lua`
 
 Plays a cash-register sound when one of your auctions sells.
@@ -36,12 +30,11 @@ Plays a cash-register sound when one of your auctions sells.
 ```
 TymeUI.toc            load order; every file is listed here explicitly
 Core.lua              addon namespace, chat output, event dispatch
-SoundPack.lua         sound registration + path lookup
 Commands.lua          slash commands
 Features/             one file per behaviour
 Brokers/              one file per LibDataBroker object
 Libraries/            LibStub, CallbackHandler, LibDataBroker
-Media/                sounds and broker icons
+Media/                broker icons and the auction sound
 ```
 
 Files are loaded in the order the `.toc` lists them. Each one receives the addon

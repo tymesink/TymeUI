@@ -12,8 +12,6 @@ lists it. There are no `Load.xml` files and no module registry.
 - [Core.lua](source/TymeUI/Core.lua) — the shared namespace. Defines
   `TymeUI:Print(message)`, `TymeUI:On(event, handler)`, and the `prefix` /
   `mediaPath` / `soundPath` fields.
-- [SoundPack.lua](source/TymeUI/SoundPack.lua) — registers bundled sounds with
-  LibSharedMedia (optional; guarded) and exposes `TymeUI:SoundFile(name)`.
 - [Commands.lua](source/TymeUI/Commands.lua) — slash commands: `/rl`,
   `/addon`+`/addons`, `/edit`, `/opt`+`/option`+`/options`.
 - [Features/](source/TymeUI/Features) — one file per behaviour.
@@ -33,9 +31,10 @@ lists it. There are no `Load.xml` files and no module registry.
   matching the existing files.
 - Prefer the modern `C_AddOns.*` namespace. Do not add the old
   `(C_AddOns and C_AddOns.X) or X` fallback pattern; this addon is Retail-only.
-- Registered LibSharedMedia names and LibDataBroker object names are part of
-  other addons' saved settings. Renaming one silently resets whatever had it
-  selected, so treat them as fixed.
+- LibDataBroker object names are part of other addons. saved settings. Renaming
+  one silently resets whatever had it selected, so treat them as fixed.
+- The shared sound pack lives in the sibling addon TymeUI_ChatNotify, which
+  registers it with LibSharedMedia. Do not re-register those sounds here.
 - There are no saved variables. If a feature needs to persist state, add
   `## SavedVariables` to the toc deliberately rather than assuming one exists.
 

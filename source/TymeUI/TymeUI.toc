@@ -2,8 +2,8 @@
 ## Title: |cff1784d1TymeUI|r
 ## Version: 1.0
 ## Author: Tymesink
-## Notes: Personal quality-of-life addon: slash commands, performance brokers, and a shared sound pack.
-## OptionalDeps: SimpleAddonManager, LibSharedMedia-3.0
+## Notes: Personal quality-of-life addon: slash commands and performance brokers.
+## OptionalDeps: SimpleAddonManager
 ## DefaultState: Enabled
 
 Libraries\LibStub.lua
@@ -11,7 +11,6 @@ Libraries\CallbackHandler-1.0.lua
 Libraries\LibDataBroker-1.1.lua
 
 Core.lua
-SoundPack.lua
 Commands.lua
 
 Features\AuctionSounds.lua

@@ -22,5 +22,5 @@ TymeUI:On("CHAT_MSG_SYSTEM", function(message)
 
 	-- "Master" rather than the default SFX channel, so the notification is still
 	-- audible with sound effects turned down.
-	PlaySoundFile(TymeUI:SoundFile("cashRegister"), "Master")
+	PlaySoundFile(TymeUI.soundPath .. "CashRegister.mp3", "Master")
 end)
