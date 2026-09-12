@@ -1,4 +1,3 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-   <Include file='Profiles\Load.xml' />
   <!--<Include file='AuctionHouse\Load.xml' /> -->
 </Ui>

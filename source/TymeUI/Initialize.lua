@@ -56,9 +56,7 @@ TYMEUI.Version = GetAddOnMetadata(AddonName, "Version")
 TYMEUI.PlayerNameRealm = E.mynameRealm
 
 local defaults = {
-  profile = {
-    ProfileAddons = {}
-  }
+  profile = {}
 }
 
 TYMEUI.Modules = {}
