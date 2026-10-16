@@ -1,4 +1,4 @@
-## Interface: 120100
+## Interface: 120100, 120105
 ## Title: |cff1784d1TymeUI|r
 ## Version: 1.0
 ## Author: Tymesink
